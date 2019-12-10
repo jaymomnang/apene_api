@@ -6,11 +6,12 @@ var app = express();
 var port = process.env.PORT || 3100;
 import invoices from "./models/invoiceModel";
 import budgets from "./models/usersModel";
-import COA from "./models/CoursesModel";
+import COA from "./models/COAModel";
 import projects from "./models/AttendanceModel";
 import settings from "./models/AppSettingModel";
 import receipts from "./models/receiptModel";
 import cashbook from "./models/cashbookModel";
+import users from "./models/usersModel";
 import { MongoClient } from "mongodb";
 
 MongoClient.connect(
@@ -33,6 +34,7 @@ MongoClient.connect(
     await settings.injectDB(client);
     await receipts.injectDB(client);
     await cashbook.injectDB(client);
+    await users.injectDB(client);
     app.listen(port, () => {
       console.log(`listening on port ${port}`);
     });
