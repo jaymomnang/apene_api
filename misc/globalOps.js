@@ -9,7 +9,14 @@ export default class globalOps {
     let hrs = ct_.getHours();
     let min = ct_.getMinutes();
 
-    ct_ = mm + "/" + dd + "/" + yyyy + " " + hrs + ":" + min;
+    if(min.length == 1){
+      min = "0" + min;
+    }
+    if(hrs.length == 1){
+      hrs = "0" + hrs;
+    }
+    var str = "";    
+    ct_ = str.concat(dd, '/', mm, '/', yyyy, " ", hrs, ":", min);
     return ct_;
   }
 }
