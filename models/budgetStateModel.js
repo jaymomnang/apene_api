@@ -63,7 +63,7 @@ export default class budgetStateModel {
 
       return await budgetStates.insertOne(budgetStateDoc, { w: "majority" });
     } catch (e) {
-      console.error(`Unable to post to charts of accounts: ${e}`);
+      console.error(`Unable to post to budgetStates: ${e}`);
       return { error: e };
     }
   }
@@ -83,7 +83,7 @@ export default class budgetStateModel {
   static async updatebudgetState(AccountID, budgetID, budgetStateID, costcenter, name, description, isActive, user) {
     try {
       // TODO: Create/Update budgetStates
-      // Use the AccountID to select the proper budgetState, then update.
+      // Use the AccountID, budgetID & budgetStateID to select the proper budgetState, then update.
 
       let date_upd = globalOps.currentDateTime();
 
@@ -103,15 +103,15 @@ export default class budgetStateModel {
 
       return updateResponse;
     } catch (e) {
-      console.error(`Unable to update charts of accounts: ${e}`);
+      console.error(`Unable to update budgetStates: ${e}`);
       return { error: e };
     }
   }
 
-  //deactivate a specific account
+  //deactivate a specific budgetState
   static async deletebudgetState(AccountID, budgetID, budgetStateID) {
     /**
-    Ticket: deactivate budgetState. Only active accounts can be voided.
+    Ticket: deactivate budgetState. Only active budgetStates can be voided.
     */
 
     try {
@@ -123,7 +123,7 @@ export default class budgetStateModel {
 
       return deleteResponse;
     } catch (e) {
-      console.error(`Unable to deactivate the specified account: ${e}`);
+      console.error(`Unable to deactivate the specified budgetState: ${e}`);
       return { error: e };
     }
   }
@@ -153,7 +153,7 @@ export default class budgetStateModel {
 
       return await aggregateResult.toArray();
     } catch (e) {
-      console.error(`Unable to retrieve charts of accounts: ${e}`);
+      console.error(`Unable to retrieve budgetStates: ${e}`);
       return { error: e };
     }
   }

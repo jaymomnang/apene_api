@@ -58,7 +58,7 @@ export default class budgetModel {
 
       return await budgets.insertOne(budgetDoc, { w: "majority" });
     } catch (e) {
-      console.error(`Unable to post to charts of accounts: ${e}`);
+      console.error(`Unable to post to budgets: ${e}`);
       return { error: e };
     }
   }
@@ -102,15 +102,15 @@ export default class budgetModel {
 
       return updateResponse;
     } catch (e) {
-      console.error(`Unable to update charts of accounts: ${e}`);
+      console.error(`Unable to update budgets: ${e}`);
       return { error: e };
     }
   }
 
-  //deactivate a specific account
+  //deactivate a specific budget
   static async deletebudget(AccountID, budgetID) {
     /**
-    Ticket: deactivate budget. Only active accounts can be voided.
+    Ticket: deactivate budget. Only active budget can be voided.
     */
 
     try {
@@ -122,7 +122,7 @@ export default class budgetModel {
 
       return deleteResponse;
     } catch (e) {
-      console.error(`Unable to deactivate the specified account: ${e}`);
+      console.error(`Unable to deactivate the specified budget: ${e}`);
       return { error: e };
     }
   }
@@ -153,7 +153,7 @@ export default class budgetModel {
 
       return await aggregateResult.toArray();
     } catch (e) {
-      console.error(`Unable to retrieve charts of accounts: ${e}`);
+      console.error(`Unable to retrieve budgets: ${e}`);
       return { error: e };
     }
   }
