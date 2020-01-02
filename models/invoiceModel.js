@@ -31,8 +31,6 @@ export default class invoiceModel {
    * @param {Object} invoiceDetails - Details of items, quantity and prices on the invoice.
    * @param {Object} customer - The customer to whom the invoice is issued.
    * @param {Object} shipTo - The shipping details.
-   * @param {string} dateUpdated - The date on which the Invoice was last updated.
-   * @param {Object} updateBy - The user that last updated the invoice.
    * @returns {DAOResponse} Returns an object with either DB response or "error"
    */
   static async addInvoice(
@@ -45,13 +43,13 @@ export default class invoiceModel {
     orderNo,
     invoiceDetails,
     customer,
-    shipTo,
-    dateUpdated,
-    updateBy
+    shipTo
   ) {
     try {
       // TODO: Create/Update invoices
       // Construct the Invoice document to be inserted.
+      let date_upd = globalOps.currentDateTime();
+
       const InvoiceDoc = {
         invoiceID: invoiceID,
         user: user,
@@ -63,8 +61,10 @@ export default class invoiceModel {
         invoiceDetails: invoiceDetails,
         customer: customer,
         shipTo: shipTo,
-        dateUpdated: dateUpdated,
-        updateBy: updateBy,
+        dateCreated: date_upd,
+        createdBy: user,
+        dateUpdated: date_upd,
+        updateBy: user,
         status: "OPEN"
       };
 
