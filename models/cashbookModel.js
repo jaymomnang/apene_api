@@ -26,7 +26,7 @@ export default class cashbookModel {
    * @param {string} transactionDate - The date of the transaction.
    * @param {Number} totalAmount - The total amount on the cashbook transaction.
    * @param {string} description - Description of the cashbook.
-   * @param {Object} details - the user that created/updated the account.
+   * @param {Object} details - the details of the cashbook transaction.
    * @param {Boolean} isActive - Switch to turn on/off an cashbook.
    * @param {Object} user - the user that created/updated the cashbook.
    * @returns {DAOResponse} Returns an object with either DB response or "error"
@@ -73,7 +73,7 @@ export default class cashbookModel {
    * @param {string} transactionID - The transaction ID.
    * @param {Number} totalAmount - The total amount on the cashbook transaction.
    * @param {string} description - Description of the cashbook.
-   * @param {Object} details - the user that created/updated the account.
+   * @param {Object} details - the details of the cashbook transaction.
    * @param {Boolean} isActive - Switch to turn on/off the cashbook transaction.
    * @param {string} status - state of the cashbook transaction.
    * @param {Object} user - the user that created/updated the cashbook.
