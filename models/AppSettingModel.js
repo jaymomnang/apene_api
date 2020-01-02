@@ -129,14 +129,10 @@ export default class settingModel {
     Todo: retrieve all settings from the database using slow loading. Limit to first 20
     */
     try {
-      // Return the 20 most recent settings.
       const pipeline = [
         {
           $sort: { settingID: -1 }
         },
-        {
-          $limit: 20
-        }
       ];
 
       // Use a more durable Read Concern here to make sure this data is not stale.

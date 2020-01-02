@@ -1,41 +1,143 @@
-'use strict';
-var mongoose = require('mongoose'),
-  AppSetting = mongoose.model('AppSetting');
+import appSettings from "../models/AppSettingModel"
 
-exports.get_settings = function(req, res) {
-  AppSetting.find({}, function(err, appSetting) {
-    if (err) res.send(err);
-    res.json(appSetting);
-  });
-};
+const _PAGE = 20;
 
-exports.add_setting = function(req, res) {
-  var new_setting = new AppSetting(req.body);
-  new_setting.save(function(err, appSetting) {
-    if (err) res.send(err);
-    res.json(appSetting);
-  });
-};
+export default class appSettingsController {
+  static async getAppSettings(req, res, next) {
+    const { appSettingsList, totalNumItems } = await appSettings.getAllsettings()
+    let response = {
+      appSettings: appSettingsList,
+      page: 0,
+      filters: {},
+      items_per_page: _PAGE,
+      total_items: totalNumItems,
+    }
+    res.json(response)
+  }
 
-exports.update_setting = function(req, res) {
-  AppSetting.findOneAndUpdate({_settingId: req.params.settingId}, req.body, {new: true}, function(err, appSetting) {
-    if (err) res.send(err);
-    res.json(appSetting);
-  });
-};
+  // static async getAppSettingsByCountry(req, res, next) {
+  //   let countries = Array.isArray(req.query.countries)
+  //     ? req.query.countries
+  //     : Array(req.query.countries)
+  //   let appSettingsList = await appSettings.getAppSettingsByCountry(countries)
+  //   let response = {
+  //     settings: appSettingsList,
+  //   }
+  //   res.json(response)
+  // }
 
-exports.delete_setting = function(req, res) {
-  AppSetting.findOneAndUpdate({_settingId: req.params.settingId}, req.body, {new: true}, function(err, appSetting) {
-    if (err)
-      res.send(err);
-      res.json({message: 'User deactivated successfully'});
-  });
-};
+  static async getAppSettingById(req, res, next) {
+    try {
+      let id = req.params.id || {}
+      let appSetting = await appSettings.getAppSettingByID(id)
+      if (!appSetting) {
+        res.status(404).json({ error: "Not found" })
+        return
+      }
+      let updated_type = appSetting.lastupdated instanceof Date ? "Date" : "other"
+      res.json({ appSetting, updated_type })
+    } catch (e) {
+      console.log(`api, ${e}`)
+      res.status(500).json({ error: e })
+    }
+  }
 
-exports.remove_setting = function(req, res) {
-  AppSetting.remove({_settingId: req.params.settingId}, function(err, appSetting) {
-    if (err)
-     res.send(err);
-     res.json({ message: 'User successfully removed' });
- });
-};
+  static async searchAppSettings(req, res, next) {
+    let page
+    try {
+      page = req.query.page ? parseInt(req.query.page, 10) : 0
+    } catch (e) {
+      console.error(`Got bad value for page:, ${e}`)
+      page = 0
+    }
+    let searchType
+    try {
+      searchType = Object.keys(req.query)[0]
+    } catch (e) {
+      console.error(`No search keys specified: ${e}`)
+    }
+
+    let filters = {}
+
+    switch (searchType) {
+      case "ID":
+        filters.ID = req.query.ID
+        break
+      case "description":
+        filters.description = req.query.description
+        break
+      case "name":
+        filters.name = req.query.name
+        break
+      default:
+      // nothing to do
+    }
+
+    const { appSettingsList, totalNumItems } = await appSettings.getAllSettings({
+      filters,
+      page,
+      _PAGE,
+    })
+
+    let response = {
+      appSettings: appSettingsList,
+      page: page,
+      filters,
+      items_per_page: _PAGE,
+      total_results: totalNumItems,
+    }
+
+    res.json(response)
+  }
+
+  static async facetedSearch(req, res, next) {
+
+    let page
+    try {
+      page = req.query.page ? parseInt(req.query.page, 10) : 0
+    } catch (e) {
+      console.error(`Got bad value for page, defaulting to 0: ${e}`)
+      page = 0
+    }
+
+    if (!req.query.cast) {
+      return this.searchAppSettings(req, res, next)
+    }
+
+    const filters = { cast: req.query.cast }
+
+    const facetedSearchResult = await appSettings.facetedSearch({
+      filters,
+      page,
+      _PAGE,
+    })
+
+    let response = {
+      appSettings: facetedSearchResult.appSettings,
+      facets: {
+        runtime: facetedSearchResult.runtime,
+        rating: facetedSearchResult.rating,
+      },
+      page: page,
+      filters,
+      items_per_page: _PAGE,
+      total_results: facetedSearchResult.count,
+    }
+
+    res.json(response)
+  }
+
+  // static async getConfig(req, res, next) {
+  //   const { poolSize, wtimeout, authInfo } = await appSettings.getConfiguration()
+  //   try {
+  //     let response = {
+  //       pool_size: poolSize,
+  //       wtimeout,
+  //       ...authInfo,
+  //     }
+  //     res.json(response)
+  //   } catch (e) {
+  //     res.status(500).json({ error: e })
+  //   }
+  // }
+}
