@@ -77,7 +77,7 @@ export default class invoicesController {
       filters,
       page,
       _PAGE,
-    })6+
+    })
 
     let response = {
       invoices: invoicesList,
