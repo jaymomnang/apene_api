@@ -1,65 +1,135 @@
-'use strict';
-var mongoose = require('mongoose'),
-  crypt = require('crypto'),
-  User = mongoose.model('Users');
-const secret = '#M0r1ng4C0r3';
+import users from "../models/usersModel"
 
-var getHash = function(pwd){
-  const hash = crypt.createHmac('sha256', secret)
-                     .update(pwd)
-                     .digest('hex');
-  return hash;
+const _PAGE = 20;
+
+export default class usersController {
+  static async getusers(req, res, next) {
+    const { usersList, totalNumItems } = await users.getAllusers()
+    let response = {
+      users: usersList,
+      page: 0,
+      filters: {},
+      items_per_page: _PAGE,
+      total_items: totalNumItems,
+    }
+    res.json(response)
+  }
+
+  static async getuserById(req, res, next) {
+    try {
+      let id = req.params.id || {}
+      let user = await users.getuserByID(id)
+      if (!user) {
+        res.status(404).json({ error: "Not found" })
+        return
+      }
+      let updated_type = user.lastupdated instanceof Date ? "Date" : "other"
+      res.json({ user, updated_type })
+    } catch (e) {
+      console.log(`api, ${e}`)
+      res.status(500).json({ error: e })
+    }
+  }
+
+  static async searchusers(req, res, next) {
+    let page
+    try {
+      page = req.query.page ? parseInt(req.query.page, 10) : 0
+    } catch (e) {
+      console.error(`Got bad value for page:, ${e}`)
+      page = 0
+    }
+    let searchType
+    try {
+      searchType = Object.keys(req.query)[0]
+    } catch (e) {
+      console.error(`No search keys specified: ${e}`)
+    }
+
+    let filters = {}
+
+    switch (searchType) {
+      case "Email":
+        filters.email = req.query.email
+        break
+      case "firstname":
+        filters.firstname = req.query.firstname
+        break
+      case "lastname":
+        filters.lastname = req.query.lastname
+        break
+      case "status":
+        filters.status = req.query.status
+        break
+      default:
+      // nothing to do
+    }
+
+    const { usersList, totalNumItems } = await users.getAllusers({
+      filters,
+      page,
+      _PAGE,
+    })
+
+    let response = {
+      users: usersList,
+      page: page,
+      filters,
+      items_per_page: _PAGE,
+      total_results: totalNumItems,
+    }
+
+    res.json(response)
+  }
+
+  static async facetedSearch(req, res, next) {
+
+    let page
+    try {
+      page = req.query.page ? parseInt(req.query.page, 10) : 0
+    } catch (e) {
+      console.error(`Got bad value for page, defaulting to 0: ${e}`)
+      page = 0
+    }
+
+    if (!req.query.cast) {
+      return this.searchusers(req, res, next)
+    }
+
+    const filters = { cast: req.query.cast }
+
+    const facetedSearchResult = await users.facetedSearch({
+      filters,
+      page,
+      _PAGE,
+    })
+
+    let response = {
+      users: facetedSearchResult.users,
+      facets: {
+        runtime: facetedSearchResult.runtime,
+        rating: facetedSearchResult.rating,
+      },
+      page: page,
+      filters,
+      items_per_page: _PAGE,
+      total_results: facetedSearchResult.count,
+    }
+
+    res.json(response)
+  }
+
+  static async getConfig(req, res, next) {
+    const { poolSize, wtimeout, authInfo } = await users.getConfiguration()
+    try {
+      let response = {
+        pool_size: poolSize,
+        wtimeout,
+        ...authInfo,
+      }
+      res.json(response)
+    } catch (e) {
+      res.status(500).json({ error: e })
+    }
+  }
 }
-
-
-exports.get_users = function(req, res) {
-  User.find({}, 'email firstname lastname role isActive', function(err, user) {
-    if (err)
-      res.send(err);
-    res.json(user);
-  });
-};
-
-exports.add_new_user = function(req, res) {
-  var new_user = new User(req.body);
-  var pwd = getHash(new_user.pwd);
-  new_user.pwd = pwd;
-  new_user.save(function(err, user) {
-    if (err)
-      res.send(err);
-    res.json(user);
-  });
-};
-
-exports.authenticate = function(req, res) {
-  var password = getHash(req.params.pwd);
-  User.find({email: req.params.email, pwd: password}, function(err, user) {
-    if (err)
-      res.send(err);
-    res.json(user);
-  });
-};
-
-exports.update_user_prof = function(req, res) {
-  User.findOneAndUpdate({email: req.params.email}, req.body, {new: true}, function(err, user) {
-    if (err)
-      res.send(err);
-    res.json(user);
-  });
-};
-
-exports.delete_user = function(req, res) {
-  User.findOneAndUpdate({email: req.params.email}, req.body, {new: true}, function(err, user) {
-    if (err)
-      res.send(err);
-      res.json({message: 'User deactivated successfully'});
-  });
-};
-
-exports.removeUser = function(req, res) {
-  User.remove({email: req.params.email}, function(err, user) {
-    if (err)
-     res.send(err);
-     res.json({ message: 'User successfully removed' });
- });
-};

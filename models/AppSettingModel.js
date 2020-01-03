@@ -132,7 +132,7 @@ export default class settingModel {
       const pipeline = [
         {
           $sort: { settingID: -1 }
-        },
+        }
       ];
 
       // Use a more durable Read Concern here to make sure this data is not stale.

@@ -3,6 +3,7 @@
 import globalOps from "../misc/globalOps";
 
 let users;
+let _ns;
 
 export default class userModel {
   static async injectDB(conn) {
@@ -10,7 +11,8 @@ export default class userModel {
       return;
     }
     try {
-      // eslint-disable-next-line require-atomic-updates
+      _ns = await conn.db(process.env.NS);
+      // eslint-disable-next-line require-atomic-updates      
       users = await conn.db(process.env.NS).collection("users");
     } catch (e) {
       console.error(
@@ -137,9 +139,6 @@ export default class userModel {
       const pipeline = [
         {
           $sort: { firstname: 1, lastname: 1 }
-        },
-        {
-          $limit: 20
         }
       ];
 
@@ -186,6 +185,24 @@ export default class userModel {
       return { error: e };
     }
   }
+
+  /**
+   * Retrieves the connection pool size, write concern and user roles on the
+   * current client.
+   * @returns {Promise<ConfigurationResult>} An object with configuration details.
+   */
+  static async getConfiguration() {
+    const roleInfo = await _ns.command({ connectionStatus: 1 })
+    const authInfo = roleInfo.authInfo.authenticatedUserRoles[0]
+    const { poolSize, wtimeout } = users.s.db.serverConfig.s.options
+    let response = {
+      poolSize,
+      wtimeout,
+      authInfo,
+    }
+    return response
+  }
+
 }
 
 /**

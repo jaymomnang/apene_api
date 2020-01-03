@@ -1,12 +1,12 @@
-import appSettings from "../models/AppSettingModel"
+import invoices from "../models/invoiceModel"
 
 const _PAGE = 20;
 
-export default class appSettingsController {
-  static async getAppSettings(req, res, next) {
-    const { appSettingsList, totalNumItems } = await appSettings.getAllsettings()
+export default class invoicesController {
+  static async getInvoices(req, res, next) {
+    const { invoicesList, totalNumItems } = await invoices.getAllInvoices()
     let response = {
-      appSettings: appSettingsList,
+      invoices: invoicesList,
       page: 0,
       filters: {},
       items_per_page: _PAGE,
@@ -15,34 +15,34 @@ export default class appSettingsController {
     res.json(response)
   }
 
-  // static async getAppSettingsByCountry(req, res, next) {
+  // static async getinvoicesByCountry(req, res, next) {
   //   let countries = Array.isArray(req.query.countries)
   //     ? req.query.countries
   //     : Array(req.query.countries)
-  //   let appSettingsList = await appSettings.getAppSettingsByCountry(countries)
+  //   let invoicesList = await invoices.getinvoicesByCountry(countries)
   //   let response = {
-  //     settings: appSettingsList,
+  //     settings: invoicesList,
   //   }
   //   res.json(response)
   // }
 
-  static async getAppSettingById(req, res, next) {
+  static async getinvoiceById(req, res, next) {
     try {
       let id = req.params.id || {}
-      let appSetting = await appSettings.getAppSettingByID(id)
-      if (!appSetting) {
+      let invoice = await invoices.getInvoiceById(id)
+      if (!invoice) {
         res.status(404).json({ error: "Not found" })
         return
       }
-      let updated_type = appSetting.lastupdated instanceof Date ? "Date" : "other"
-      res.json({ appSetting, updated_type })
+      let updated_type = invoice.lastupdated instanceof Date ? "Date" : "other"
+      res.json({ invoice, updated_type })
     } catch (e) {
       console.log(`api, ${e}`)
       res.status(500).json({ error: e })
     }
   }
 
-  static async searchAppSettings(req, res, next) {
+  static async searchinvoices(req, res, next) {
     let page
     try {
       page = req.query.page ? parseInt(req.query.page, 10) : 0
@@ -73,14 +73,14 @@ export default class appSettingsController {
       // nothing to do
     }
 
-    const { appSettingsList, totalNumItems } = await appSettings.getAllSettings({
+    const { invoicesList, totalNumItems } = await invoices.getAllInvoices({
       filters,
       page,
       _PAGE,
-    })
+    })6+
 
     let response = {
-      appSettings: appSettingsList,
+      invoices: invoicesList,
       page: page,
       filters,
       items_per_page: _PAGE,
@@ -101,19 +101,19 @@ export default class appSettingsController {
     }
 
     if (!req.query.cast) {
-      return this.searchAppSettings(req, res, next)
+      return this.searchinvoices(req, res, next)
     }
 
     const filters = { cast: req.query.cast }
 
-    const facetedSearchResult = await appSettings.facetedSearch({
+    const facetedSearchResult = await invoices.facetedSearch({
       filters,
       page,
       _PAGE,
     })
 
     let response = {
-      appSettings: facetedSearchResult.appSettings,
+      invoices: facetedSearchResult.invoices,
       facets: {
         runtime: facetedSearchResult.runtime,
         rating: facetedSearchResult.rating,
@@ -128,7 +128,7 @@ export default class appSettingsController {
   }
 
   static async getConfig(req, res, next) {
-    const { poolSize, wtimeout, authInfo } = await appSettings.getConfiguration()
+    const { poolSize, wtimeout, authInfo } = await invoices.getConfiguration()
     try {
       let response = {
         pool_size: poolSize,
