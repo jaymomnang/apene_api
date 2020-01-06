@@ -2,6 +2,7 @@
 import globalOps from "../misc/globalOps";
 
 let coas;
+let _ns;
 
 export default class coaModel {
   static async injectDB(conn) {
@@ -9,6 +10,7 @@ export default class coaModel {
       return;
     }
     try {
+      _ns = await conn.db(process.env.NS);
       // eslint-disable-next-line require-atomic-updates
       coas = await conn.db(process.env.NS).collection("COA");
     } catch (e) {
@@ -125,16 +127,12 @@ export default class coaModel {
   //retrieve all coas
   static async getAllcoas() {
     /**
-    Todo: retrieve all coas from the database using slow loading. Limit to first 20
+    Todo: retrieve all coas from the database using slow loading.
     */
     try {
-      // Return the 20 most recent coas.
       const pipeline = [
         {
           $sort: { AccountID: -1 }
-        },
-        {
-          $limit: 20
         }
       ];
 
@@ -151,6 +149,48 @@ export default class coaModel {
       return { error: e };
     }
   }
+
+  //retrieve a specific account from the charts db
+  static async getCOAByID(Id) {
+    try {
+      const pipeline = [
+        {
+          $match: { AccountID: Id }
+        }
+      ];
+
+      // Use a more durable Read Concern here to make sure this data is not stale.
+      const readConcern = "majority"; //coas.readConcern
+
+      const aggregateResult = await coas.aggregate(pipeline, {
+        readConcern
+      });
+
+      return await aggregateResult.toArray();
+    } catch (e) {
+      console.error(`Unable to retrieve charts of accounts: ${e}`);
+      return { error: e };
+    }
+  }
+
+  
+  /**
+   * Retrieves the connection pool size, write concern and user roles on the
+   * current client.
+   * @returns {Promise<ConfigurationResult>} An object with configuration details.
+   */
+  static async getConfiguration() {
+    const roleInfo = await _ns.command({ connectionStatus: 1 })
+    const authInfo = roleInfo.authInfo.authenticatedUserRoles[0]
+    const { poolSize, wtimeout } = coas.s.db.serverConfig.s.options
+    let response = {
+      poolSize,
+      wtimeout,
+      authInfo,
+    }
+    return response
+  }
+
 }
 
 /**

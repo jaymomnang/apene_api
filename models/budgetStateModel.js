@@ -2,6 +2,7 @@
 import globalOps from "../misc/globalOps";
 
 let budgetStates;
+let _ns;
 
 export default class budgetStateModel {
   static async injectDB(conn) {
@@ -9,6 +10,7 @@ export default class budgetStateModel {
       return;
     }
     try {
+      _ns = await conn.db(process.env.NS);
       // eslint-disable-next-line require-atomic-updates
       budgetStates = await conn.db(process.env.NS).collection("budgetStates");
     } catch (e) {
@@ -131,16 +133,12 @@ export default class budgetStateModel {
   //retrieve all budgetStates
   static async getAllbudgetStates() {
     /**
-    Todo: retrieve all budgetStates from the database using slow loading. Limit to first 20
+    Todo: retrieve all budgetStates from the database using slow loading.
     */
     try {
-      // Return the 20 most recent budgetStates.
       const pipeline = [
         {
           $sort: { AccountID: -1, budgetID: -1, budgetStateID: -1 }
-        },
-        {
-          $limit: 20
         }
       ];
 
@@ -157,6 +155,79 @@ export default class budgetStateModel {
       return { error: e };
     }
   }
+
+//retrieve a specific budgetState
+static async getBudgetStateByID(Id) {
+  /**
+  Todo: retrieve budgetState from the database.
+  */
+  try {
+    const pipeline = [
+      {
+        $match: { budgetStateID: Id }
+      }
+    ];
+
+    // Use a more durable Read Concern here to make sure this data is not stale.
+    const readConcern = "majority"; //budgetStates.readConcern
+
+    const aggregateResult = await budgetStates.aggregate(pipeline, {
+      readConcern
+    });
+
+    return await aggregateResult.toArray();
+  } catch (e) {
+    console.error(`Unable to retrieve budgetStates: ${e}`);
+    return { error: e };
+  }
+}
+
+
+//retrieve a specific cost center
+static async getCostCenterByID(BudgetID, Id) {
+  /**
+  Todo: retrieve cost center from the database given stateID and costcenterID.
+  */
+  try {
+    const pipeline = [
+      {
+        $match: { budgetStateID: BudgetID, 'costcenter.Id': Id }
+      }
+    ];
+
+    // Use a more durable Read Concern here to make sure this data is not stale.
+    const readConcern = "majority"; //budgetStates.readConcern
+
+    const aggregateResult = await budgetStates.aggregate(pipeline, {
+      readConcern
+    });
+
+    return await aggregateResult.toArray();
+  } catch (e) {
+    console.error(`Unable to retrieve budgetStates: ${e}`);
+    return { error: e };
+  }
+}
+
+
+  /**
+   * Retrieves the connection pool size, write concern and user roles on the
+   * current client.
+   * @returns {Promise<ConfigurationResult>} An object with configuration details.
+   */
+  static async getConfiguration() {
+    const roleInfo = await _ns.command({ connectionStatus: 1 })
+    const authInfo = roleInfo.authInfo.authenticatedUserRoles[0]
+    const { poolSize, wtimeout } = budgetStates.s.db.serverConfig.s.options
+    let response = {
+      poolSize,
+      wtimeout,
+      authInfo,
+    }
+    return response
+  }
+
+
 }
 
 /**

@@ -2,6 +2,7 @@
 import globalOps from "../misc/globalOps";
 
 let budgets;
+let _ns;
 
 export default class budgetModel {
   static async injectDB(conn) {
@@ -9,6 +10,7 @@ export default class budgetModel {
       return;
     }
     try {
+      _ns = await conn.db(process.env.NS);
       // eslint-disable-next-line require-atomic-updates
       budgets = await conn.db(process.env.NS).collection("budgets");
     } catch (e) {
@@ -127,20 +129,15 @@ export default class budgetModel {
     }
   }
 
-
   //retrieve all budgets
   static async getAllbudgets() {
     /**
-    Todo: retrieve all budgets from the database using slow loading. Limit to first 20
+    Todo: retrieve all budgets from the database using slow loading.
     */
     try {
-      // Return the 20 most recent budgets.
       const pipeline = [
         {
           $sort: { AccountID: -1, budgetID: -1 }
-        },
-        {
-          $limit: 20
         }
       ];
 
@@ -157,6 +154,47 @@ export default class budgetModel {
       return { error: e };
     }
   }
+
+  //retrieve a specific budget
+  static async getBudgetByID(Id) {
+    try {
+      const pipeline = [
+        {
+          $match: { budgetID: Id }
+        }
+      ];
+
+      // Use a more durable Read Concern here to make sure this data is not stale.
+      const readConcern = "majority"; //budgets.readConcern
+
+      const aggregateResult = await budgets.aggregate(pipeline, {
+        readConcern
+      });
+
+      return await aggregateResult.toArray();
+    } catch (e) {
+      console.error(`Unable to retrieve budgets: ${e}`);
+      return { error: e };
+    }
+  }
+
+  /**
+   * Retrieves the connection pool size, write concern and user roles on the
+   * current client.
+   * @returns {Promise<ConfigurationResult>} An object with configuration details.
+   */
+  static async getConfiguration() {
+    const roleInfo = await _ns.command({ connectionStatus: 1 })
+    const authInfo = roleInfo.authInfo.authenticatedUserRoles[0]
+    const { poolSize, wtimeout } = budgets.s.db.serverConfig.s.options
+    let response = {
+      poolSize,
+      wtimeout,
+      authInfo,
+    }
+    return response
+  }
+
 }
 
 /**
