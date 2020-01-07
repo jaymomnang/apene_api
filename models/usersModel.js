@@ -166,9 +166,32 @@ export default class userModel {
       const pipeline = [
         {
           $match: {email: email, pwd: pwd, sl: sl}
-        },
+        }
+      ];
+
+      // Use a more durable Read Concern here to make sure this data is not stale.
+      const readConcern = "majority"; //users.readConcern
+
+      const aggregateResult = await users.aggregate(pipeline, {
+        readConcern
+      });
+
+      return await aggregateResult.toArray();
+    } catch (e) {
+      console.error(`Unable to retrieve users: ${e}`);
+      return { error: e };
+    }
+  }
+
+  static async getusers() {
+    /**
+    Todo: retrieve user accounts.
+    */
+    try {
+      // Return the all user accounts.
+      const pipeline = [
         {
-          $sort: { email: -1 }
+          $sort: {firstname: -1, lastname: -1}
         }
       ];
 

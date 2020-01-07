@@ -2,24 +2,41 @@
   "name": "apene_api",
   "version": "0.1.0",
   "description": "Apene API",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start": "nodemon -r esm index.js",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --passWithNoTests --watch",
+    "changestream:update": "node test/lessons/change-updates.js",
+    "changestream:insert": "node test/lessons/change-insert.js"
   },
   "dependencies": {
+    "babel-eslint": "^10.0.3",
     "consolidate": "^0.13.1",
-    "express-session": "^1.16.1"
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-import": "^2.19.1",
+    "esm": "^3.2.25",
+    "express-session": "^1.16.1",
+    "morgan": "^1.9.1"
   },
   "author": "Julius Momnang",
   "license": "0BSD",
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-1": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "babel-runtime": "^6.26.0",
     "body-parser": "^1.19.0",
     "connect": "^3.7.0",
     "consolidate": "^0.13.1",
-    "eslint": "^6.7.2",
+    "eslint": "^6.8.0",
+    "eslint-plugin-import": "^2.19.1",
     "express": "^4.17.1",
-    "mongodb": "^3.3.5",
+    "mongodb": "^3.4.1",
     "nodemon": "^1.19.1",
     "nunjucks": "^3.2.0",
     "request": "^2.88.0"
