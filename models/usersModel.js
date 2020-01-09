@@ -132,10 +132,9 @@ export default class userModel {
   //retrieve all users
   static async getAllusers() {
     /**
-    Todo: retrieve all users from the database using slow loading. Limit to first 20
+    Todo: retrieve all users from the database using slow loading.
     */
     try {
-      // Return the 20 most recent users.
       const pipeline = [
         {
           $sort: { firstname: 1, lastname: 1 }
@@ -144,10 +143,10 @@ export default class userModel {
 
       // Use a more durable Read Concern here to make sure this data is not stale.
       const readConcern = "majority"; //users.readConcern
-
+      
       const aggregateResult = await users.aggregate(pipeline, {
         readConcern
-      });
+      }).next();
 
       return await aggregateResult.toArray();
     } catch (e) {

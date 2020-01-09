@@ -8,6 +8,9 @@ import budgetStateCTRL from "../controllers/budgetStateController"
 
 const router = new Router()
 
+//default route
+router.route("/").get(appSettingsCTRL.getAppSettings)
+
 // routes for app settings
 router.route("/settings/").get(appSettingsCTRL.getAppSettings)
 router.route("/settings/search").get(appSettingsCTRL.searchAppSettings)
