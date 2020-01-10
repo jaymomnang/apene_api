@@ -29,6 +29,7 @@
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.19.1",
     "express": "^4.17.1",
+    "jest": "^24.9.0",
     "mongodb": "^3.4.1",
     "nodemon": "^1.19.1",
     "nunjucks": "^3.2.0",
