@@ -5,10 +5,9 @@ const _PAGE = 20;
 export default class budgetStateController {
   static async getbudgetStates(req, res) {
 
-    let  budgetStateList, totalNumItems 
-    const _obj = await budgetState.getAllbudgetStates()
-    budgetStateList = _obj[0]
-    totalNumItems = _obj[1]
+    let totalNumItems 
+    const budgetStateList = await budgetState.getAllbudgetStates()
+    totalNumItems = budgetStateList.length
 
     let response = {
       budgetState: budgetStateList,

@@ -5,10 +5,9 @@ const _PAGE = 20;
 export default class usersController {
   static async getusers(req, res) {
     
-    let usersList, totalNumItems 
-    const _obj = await users.getAllusers()
-    usersList = _obj[0]
-    totalNumItems = _obj[1]
+    let totalNumItems 
+    const usersList = await users.getAllusers()
+    totalNumItems = usersList.length
 
     let response = {
       users: usersList,

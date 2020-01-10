@@ -5,10 +5,9 @@ const _PAGE = 20;
 export default class invoicesController {
   static async getInvoices(req, res) {
 
-    let invoicesList, totalNumItems 
-    const _obj = await invoices.getAllInvoices()
-    invoicesList = _obj[0]
-    totalNumItems = _obj[1]
+    let totalNumItems 
+    const invoicesList = await invoices.getAllInvoices()
+    totalNumItems = invoicesList.length
 
     let response = {
       invoices: invoicesList,

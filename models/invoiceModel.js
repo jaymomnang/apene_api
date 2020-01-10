@@ -176,10 +176,7 @@ export default class invoiceModel {
         readConcern
       });
 
-      if (aggregateResult.length > 1){
-        return await aggregateResult.toArray();
-      }
-      return new Array(aggregateResult, 1)
+      return await aggregateResult.toArray();
 
     } catch (e) {
       console.error(`Unable to retrieve invoices: ${e}`);

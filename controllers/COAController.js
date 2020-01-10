@@ -5,10 +5,9 @@ const _PAGE = 20;
 export default class COAController {
   static async getCOA(req, res) {
 
-    let COAList, totalNumItems 
-    const _obj = await COA.getAllCOAs()
-    COAList = _obj[0]
-    totalNumItems = _obj[1]
+    let totalNumItems 
+    const COAList = await COA.getAllCOAs()
+    totalNumItems = COAList.length
 
     let response = {
       COA: COAList,

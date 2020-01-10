@@ -5,10 +5,9 @@ const _PAGE = 20;
 export default class appSettingsController {
   static async getAppSettings(req, res) {
 
-    let  appSettingsList, totalNumItems 
-    const _obj = await appSettings.getAllsettings()
-    appSettingsList = _obj[0]
-    totalNumItems = _obj[1]
+    let totalNumItems 
+    const appSettingsList = await appSettings.getAllsettings()
+    totalNumItems = appSettingsList.length
 
     let response = {
       appSettings: appSettingsList,
