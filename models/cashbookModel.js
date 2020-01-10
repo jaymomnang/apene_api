@@ -131,16 +131,12 @@ export default class cashbookModel {
   //retrieve cashbooks transactions
   static async getAllcashbooks() {
     /**
-    Todo: retrieve cashbooks transactions from the database using slow loading. Limit to first 20
+    Todo: retrieve cashbooks transactions from the database using slow loading.
     */
     try {
-      // Return the 20 most recent cashbooks.
       const pipeline = [
         {
           $sort: { transactionID: -1, transactionDate: -1 }
-        },
-        {
-          $limit: 20
         }
       ];
 
@@ -151,7 +147,11 @@ export default class cashbookModel {
         readConcern
       });
 
-      return await aggregateResult.toArray();
+      if (aggregateResult.length > 1){
+        return await aggregateResult.toArray();
+      }
+      return new Array(aggregateResult, 1)
+
     } catch (e) {
       console.error(`Unable to retrieve cashbook transactions: ${e}`);
       return { error: e };

@@ -142,7 +142,11 @@ export default class settingModel {
         readConcern
       });
 
-      return await aggregateResult.toArray();
+      if (aggregateResult.length > 1){
+        return await aggregateResult.toArray();
+      }
+      return new Array(aggregateResult, 1)
+
     } catch (e) {
       console.error(`Unable to retrieve settings: ${e}`);
       return { error: e };

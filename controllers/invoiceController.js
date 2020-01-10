@@ -3,8 +3,13 @@ import invoices from "../models/invoiceModel"
 const _PAGE = 20;
 
 export default class invoicesController {
-  static async getInvoices(req, res, next) {
-    const { invoicesList, totalNumItems } = await invoices.getAllInvoices()
+  static async getInvoices(req, res) {
+
+    let invoicesList, totalNumItems 
+    const _obj = await invoices.getAllInvoices()
+    invoicesList = _obj[0]
+    totalNumItems = _obj[1]
+
     let response = {
       invoices: invoicesList,
       page: 0,
@@ -26,7 +31,7 @@ export default class invoicesController {
   //   res.json(response)
   // }
 
-  static async getinvoiceById(req, res, next) {
+  static async getinvoiceById(req, res) {
     try {
       let id = req.params.id || {}
       let invoice = await invoices.getInvoiceById(id)
@@ -42,7 +47,7 @@ export default class invoicesController {
     }
   }
 
-  static async searchinvoices(req, res, next) {
+  static async searchinvoices(req, res) {
     let page
     try {
       page = req.query.page ? parseInt(req.query.page, 10) : 0
@@ -127,7 +132,7 @@ export default class invoicesController {
     res.json(response)
   }
 
-  static async getConfig(req, res, next) {
+  static async getConfig(req, res) {
     const { poolSize, wtimeout, authInfo } = await invoices.getConfiguration()
     try {
       let response = {

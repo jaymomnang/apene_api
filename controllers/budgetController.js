@@ -3,8 +3,13 @@ import budget from "../models/budgetModel"
 const _PAGE = 20;
 
 export default class budgetController {
-  static async getBudgets(req, res, next) {
-    const { budgetList, totalNumItems } = await budget.getAllbudgets()
+  static async getBudgets(req, res) {
+    
+    let  budgetList, totalNumItems 
+    const _obj = await budget.getAllbudgets()
+    budgetList = _obj[0]
+    totalNumItems = _obj[1]
+
     let response = {
       budget: budgetList,
       page: 0,
@@ -26,7 +31,7 @@ export default class budgetController {
   //   res.json(response)
   // }
 
-  static async getbudgetByID(req, res, next) {
+  static async getbudgetByID(req, res) {
     try {
       let id = req.params.id || {}
       let _budget = await budget.getBudgetByID(id)
@@ -42,7 +47,7 @@ export default class budgetController {
     }
   }
 
-  static async searchbudget(req, res, next) {
+  static async searchbudget(req, res) {
     let page
     try {
       page = req.query.page ? parseInt(req.query.page, 10) : 0
@@ -127,7 +132,7 @@ export default class budgetController {
     res.json(response)
   }
 
-  static async getConfig(req, res, next) {
+  static async getConfig(req, res) {
     const { poolSize, wtimeout, authInfo } = await budget.getConfiguration()
     try {
       let response = {

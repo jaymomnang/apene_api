@@ -148,7 +148,11 @@ export default class budgetModel {
         readConcern
       });
 
-      return await aggregateResult.toArray();
+      if (aggregateResult.length > 1){
+        return await aggregateResult.toArray();
+      }
+      return new Array(aggregateResult, 1)
+      
     } catch (e) {
       console.error(`Unable to retrieve budgets: ${e}`);
       return { error: e };

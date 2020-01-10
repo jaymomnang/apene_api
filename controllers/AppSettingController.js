@@ -3,8 +3,13 @@ import appSettings from "../models/AppSettingModel"
 const _PAGE = 20;
 
 export default class appSettingsController {
-  static async getAppSettings(req, res, next) {
-    const { appSettingsList, totalNumItems } = await appSettings.getAllsettings()
+  static async getAppSettings(req, res) {
+
+    let  appSettingsList, totalNumItems 
+    const _obj = await appSettings.getAllsettings()
+    appSettingsList = _obj[0]
+    totalNumItems = _obj[1]
+
     let response = {
       appSettings: appSettingsList,
       page: 0,
@@ -26,7 +31,7 @@ export default class appSettingsController {
   //   res.json(response)
   // }
 
-  static async getAppSettingById(req, res, next) {
+  static async getAppSettingById(req, res) {
     try {
       let id = req.params.id || {}
       let appSetting = await appSettings.getAppSettingByID(id)
@@ -42,7 +47,7 @@ export default class appSettingsController {
     }
   }
 
-  static async searchAppSettings(req, res, next) {
+  static async searchAppSettings(req, res) {
     let page
     try {
       page = req.query.page ? parseInt(req.query.page, 10) : 0
@@ -127,7 +132,7 @@ export default class appSettingsController {
     res.json(response)
   }
 
-  static async getConfig(req, res, next) {
+  static async getConfig(req, res) {
     const { poolSize, wtimeout, authInfo } = await appSettings.getConfiguration()
     try {
       let response = {

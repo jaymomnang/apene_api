@@ -3,8 +3,13 @@ import COA from "../models/COAModel"
 const _PAGE = 20;
 
 export default class COAController {
-  static async getCOA(req, res, next) {
-    const { COAList, totalNumItems } = await COA.getAllCOAs()
+  static async getCOA(req, res) {
+
+    let COAList, totalNumItems 
+    const _obj = await COA.getAllCOAs()
+    COAList = _obj[0]
+    totalNumItems = _obj[1]
+
     let response = {
       COA: COAList,
       page: 0,
@@ -26,7 +31,7 @@ export default class COAController {
   //   res.json(response)
   // }
 
-  static async getCOAByID(req, res, next) {
+  static async getCOAByID(req, res) {
     try {
       let id = req.params.id || {}
       let _coa = await COA.getCOAByID(id)
@@ -42,7 +47,7 @@ export default class COAController {
     }
   }
 
-  static async searchCOA(req, res, next) {
+  static async searchCOA(req, res) {
     let page
     try {
       page = req.query.page ? parseInt(req.query.page, 10) : 0
@@ -127,7 +132,7 @@ export default class COAController {
     res.json(response)
   }
 
-  static async getConfig(req, res, next) {
+  static async getConfig(req, res) {
     const { poolSize, wtimeout, authInfo } = await COA.getConfiguration()
     try {
       let response = {

@@ -160,7 +160,7 @@ export default class invoiceModel {
   //retrieve all invoices
   static async getAllInvoices() {
     /**
-    Todo: retrieve all invoices from the database using slow loading. Limit to first 20
+    Todo: retrieve all invoices from the database using slow loading.
     */
     try {
       const pipeline = [
@@ -176,7 +176,11 @@ export default class invoiceModel {
         readConcern
       });
 
-      return await aggregateResult.toArray();
+      if (aggregateResult.length > 1){
+        return await aggregateResult.toArray();
+      }
+      return new Array(aggregateResult, 1)
+
     } catch (e) {
       console.error(`Unable to retrieve invoices: ${e}`);
       return { error: e };
@@ -296,7 +300,6 @@ export default class invoiceModel {
     
   }
 }
-
 
 /**
  * Success/Error return object

@@ -3,11 +3,13 @@ import users from "../models/usersModel"
 const _PAGE = 20;
 
 export default class usersController {
-  static async getusers(req, res, next) {
-    const { usersList, totalNumItems } = await users.getAllusers()
-
-    console.log(usersList)
+  static async getusers(req, res) {
     
+    let usersList, totalNumItems 
+    const _obj = await users.getAllusers()
+    usersList = _obj[0]
+    totalNumItems = _obj[1]
+
     let response = {
       users: usersList,
       page: 0,
@@ -18,7 +20,7 @@ export default class usersController {
     res.json(response)
   }
 
-  static async getuserById(req, res, next) {
+  static async getuserById(req, res) {
     try {
       let id = req.params.id || {}
       let user = await users.getuserByID(id)
@@ -34,7 +36,7 @@ export default class usersController {
     }
   }
 
-  static async searchusers(req, res, next) {
+  static async searchusers(req, res) {
     let page
     try {
       page = req.query.page ? parseInt(req.query.page, 10) : 0
@@ -122,7 +124,7 @@ export default class usersController {
     res.json(response)
   }
 
-  static async getConfig(req, res, next) {
+  static async getConfig(req, res) {
     const { poolSize, wtimeout, authInfo } = await users.getConfiguration()
     try {
       let response = {

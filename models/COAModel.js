@@ -143,7 +143,11 @@ export default class coaModel {
         readConcern
       });
 
-      return await aggregateResult.toArray();
+      if (aggregateResult.length > 1){
+        return await aggregateResult.toArray();
+      }
+      return new Array(aggregateResult, 1)
+
     } catch (e) {
       console.error(`Unable to retrieve charts of accounts: ${e}`);
       return { error: e };

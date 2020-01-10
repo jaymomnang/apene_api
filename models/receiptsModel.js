@@ -163,16 +163,12 @@ export default class receiptModel {
   //retrieve all receipts
   static async getAllreceipts() {
     /**
-    Todo: retrieve all receipts from the database using slow loading. Limit to first 20
+    Todo: retrieve all receipts from the database using slow loading.
     */
     try {
-      // Return the 20 most recent receipts.
       const pipeline = [
         {
           $sort: { invoiceID: -1, receiptID: -1 }
-        },
-        {
-          $limit: 20
         }
       ];
 
@@ -183,7 +179,11 @@ export default class receiptModel {
         readConcern
       });
 
-      return await aggregateResult.toArray();
+      if (aggregateResult.length > 1){
+        return await aggregateResult.toArray();
+      }
+      return new Array(aggregateResult, 1)
+      
     } catch (e) {
       console.error(`Unable to retrieve receipts: ${e}`);
       return { error: e };

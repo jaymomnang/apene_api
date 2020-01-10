@@ -3,8 +3,13 @@ import budgetState from "../models/budgetStateModel"
 const _PAGE = 20;
 
 export default class budgetStateController {
-  static async getbudgetStates(req, res, next) {
-    const { budgetStateList, totalNumItems } = await budgetState.getAllbudgetStates()
+  static async getbudgetStates(req, res) {
+
+    let  budgetStateList, totalNumItems 
+    const _obj = await budgetState.getAllbudgetStates()
+    budgetStateList = _obj[0]
+    totalNumItems = _obj[1]
+
     let response = {
       budgetState: budgetStateList,
       page: 0,
@@ -15,7 +20,7 @@ export default class budgetStateController {
     res.json(response)
   }
 
-  static async getCostCenterByID(req, res, next) {
+  static async getCostCenterByID(req, res) {
     let budgetID = Array.isArray(req.query.budgetID)
       ? req.query.budgetID
       : Array(req.query.budgetID)
@@ -29,7 +34,7 @@ export default class budgetStateController {
     res.json(response)
   }
 
-  static async getbudgetStateByID(req, res, next) {
+  static async getbudgetStateByID(req, res) {
     try {
       let id = req.params.id || {}
       let _budgetState = await budgetState.getbudgetStateByID(id)
@@ -45,7 +50,7 @@ export default class budgetStateController {
     }
   }
 
-  static async searchbudgetState(req, res, next) {
+  static async searchbudgetState(req, res) {
     let page
     try {
       page = req.query.page ? parseInt(req.query.page, 10) : 0
@@ -130,7 +135,7 @@ export default class budgetStateController {
     res.json(response)
   }
 
-  static async getConfig(req, res, next) {
+  static async getConfig(req, res) {
     const { poolSize, wtimeout, authInfo } = await budgetState.getConfiguration()
     try {
       let response = {

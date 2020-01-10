@@ -148,7 +148,11 @@ export default class userModel {
         readConcern
       }).next();
 
-      return await aggregateResult.toArray();
+      if (aggregateResult.length > 1){
+        return await aggregateResult.toArray();
+      }
+      return new Array(aggregateResult, 1)
+      
     } catch (e) {
       console.error(`Unable to retrieve users: ${e}`);
       return { error: e };
