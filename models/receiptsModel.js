@@ -2,6 +2,7 @@
 import globalOps from "../misc/globalOps";
 
 let receipts;
+let _ns;
 
 export default class receiptModel {
   static async injectDB(conn) {
@@ -9,6 +10,7 @@ export default class receiptModel {
       return;
     }
     try {
+      _ns = await conn.db(process.env.NS);
       // eslint-disable-next-line require-atomic-updates
       receipts = await conn.db(process.env.NS).collection("receipts");
     } catch (e) {
@@ -159,7 +161,6 @@ export default class receiptModel {
     }
   }
 
-
   //retrieve all receipts
   static async getAllreceipts() {
     /**
@@ -186,6 +187,46 @@ export default class receiptModel {
       return { error: e };
     }
   }
+
+  //retrieve a receipt using the receiptId
+  static async getReceiptById(Id) {   
+    try {
+      const pipeline = [
+        {
+          $match: { receiptID: Id }
+        }
+      ];
+
+      // Use a more durable Read Concern here to make sure this data is not stale.
+      const readConcern = "majority"; //receipts.readConcern
+      const aggregateResult = await receipts.aggregate(pipeline, {
+        readConcern
+      });
+
+      return await aggregateResult.toArray();
+    } catch (e) {
+      console.error(`Unable to retrieve receipt: ${e}`);
+      return { error: e };
+    }
+  }
+
+  /**
+   * Retrieves the connection pool size, write concern and user roles on the
+   * current client.
+   * @returns {Promise<ConfigurationResult>} An object with configuration details.
+   */
+  static async getConfiguration() {
+    const roleInfo = await _ns.command({ connectionStatus: 1 })
+    const authInfo = roleInfo.authInfo.authenticatedUserRoles[0]
+    const { poolSize, wtimeout } = receipts.s.db.serverConfig.s.options
+    let response = {
+      poolSize,
+      wtimeout,
+      authInfo,
+    }
+    return response
+  }
+
 }
 
 /**

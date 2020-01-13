@@ -2,6 +2,7 @@
 import globalOps from "../misc/globalOps";
 
 let projects;
+let _ns;
 
 export default class projectModel {
   static async injectDB(conn) {
@@ -9,6 +10,7 @@ export default class projectModel {
       return;
     }
     try {
+      _ns = await conn.db(process.env.NS);
       // eslint-disable-next-line require-atomic-updates
       projects = await conn.db(process.env.NS).collection("projects");
     } catch (e) {
@@ -22,7 +24,7 @@ export default class projectModel {
    * Inserts a project into the `project` collection, with the following fields:
 
    * @param {string} projectID - The project ID.
-   * @param {string} bank - The bank for which the transactions occured.
+   * @param {Object} bank - The bank for which the transactions occured.
    * @param {string} startDate - The start date of the transaction.
    * @param {Number} totalAmount - The total amount of the project.
    * @param {string} description - Description of the project.
@@ -132,16 +134,12 @@ export default class projectModel {
   //retrieve projects
   static async getAllprojects() {
     /**
-    Todo: retrieve projects from the database using slow loading. Limit to first 20
+    Todo: retrieve projects from the database using slow loading.
     */
     try {
-      // Return the 20 most recent projects.
       const pipeline = [
         {
           $sort: { projectID: -1, startDate: -1 }
-        },
-        {
-          $limit: 20
         }
       ];
 
@@ -159,6 +157,46 @@ export default class projectModel {
       return { error: e };
     }
   }
+
+  //retrieve a project using the projectId
+  static async getProjectById(Id) {   
+    try {
+      const pipeline = [
+        {
+          $match: { projectID: Id }
+        }
+      ];
+
+      // Use a more durable Read Concern here to make sure this data is not stale.
+      const readConcern = "majority"; //projects.readConcern
+      const aggregateResult = await projects.aggregate(pipeline, {
+        readConcern
+      });
+
+      return await aggregateResult.toArray();
+    } catch (e) {
+      console.error(`Unable to retrieve project: ${e}`);
+      return { error: e };
+    }
+  }
+
+  /**
+   * Retrieves the connection pool size, write concern and user roles on the
+   * current client.
+   * @returns {Promise<ConfigurationResult>} An object with configuration details.
+   */
+  static async getConfiguration() {
+    const roleInfo = await _ns.command({ connectionStatus: 1 })
+    const authInfo = roleInfo.authInfo.authenticatedUserRoles[0]
+    const { poolSize, wtimeout } = projects.s.db.serverConfig.s.options
+    let response = {
+      poolSize,
+      wtimeout,
+      authInfo,
+    }
+    return response
+  }
+
 }
 
 /**
