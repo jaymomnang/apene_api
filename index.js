@@ -31,7 +31,7 @@ app.use("/", routes);
 app.use("*", (req, res) => res.status(404).json({ error: "not found" }));
 
 MongoClient.connect(
-  process.env.DB_URI,
+  process.env.DB_URI,  
   // TODO: Connection Pooling
   // Set the poolSize to 50 connections.
   // TODO: Timeouts
