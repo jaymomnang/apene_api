@@ -17,6 +17,7 @@ import settings from "./models/AppSettingModel";
 import receipts from "./models/receiptsModel";
 import cashbook from "./models/cashbookModel";
 import users from "./models/usersModel";
+import resume_profile from "./models/resume_profile";
 import seeder from "./models/seeder";
 
 
@@ -51,6 +52,7 @@ MongoClient.connect(
     await projects.injectDB(client)
     await settings.injectDB(client)
     await receipts.injectDB(client)
+    await resume_profile.injectDB(client)
     await cashbook.injectDB(client)
     await users.injectDB(client)
     await seeder.seedDB("apene", "COA", process.env.DB_URI)
