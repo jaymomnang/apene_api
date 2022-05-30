@@ -6,7 +6,7 @@ export default class COAController {
   static async getCOA(req, res) {
 
     let totalNumItems 
-    const COAList = await COA.getAllCOAs()
+    const COAList = await COA.getAllcoas()
     totalNumItems = COAList.length
 
     let response = {

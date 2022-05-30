@@ -18,7 +18,7 @@ import receipts from "./models/receiptsModel";
 import cashbook from "./models/cashbookModel";
 import users from "./models/usersModel";
 import resume_profile from "./models/resume_profile";
-import seeder from "./models/seeder";
+//import seeder from "./models/seeder";
 
 
 const app = express();
@@ -55,7 +55,7 @@ MongoClient.connect(
     await resume_profile.injectDB(client)
     await cashbook.injectDB(client)
     await users.injectDB(client)
-    await seeder.seedDB("apene", "COA", process.env.DB_URI)
+    //await seeder.seedDB("apene", "COA", process.env.DB_URI)
 
     app.listen(port, () => {
       console.log(`listening on port ${port}`);

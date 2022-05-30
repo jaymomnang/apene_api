@@ -14,7 +14,7 @@ async function seedDB(DB, collection, conn) {
 
     const client = new MongoClient(uri, {
         useNewUrlParser: true,
-        // useUnifiedTopology: true,
+        useUnifiedTopology: true,
     });
 
     try {
@@ -61,5 +61,3 @@ async function seedDB(DB, collection, conn) {
         console.log(err.stack);
     }
 }
-
-seedDB();

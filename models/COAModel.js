@@ -132,7 +132,9 @@ export default class coaModel {
     try {
       const pipeline = [
         {
-          $sort: { AccountID: -1 }
+          '$sort': {
+            'acct': -1
+          }
         }
       ];
 
