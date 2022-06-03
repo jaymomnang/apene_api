@@ -123,28 +123,20 @@ export default class coaModel {
     }
   }
 
-
   //retrieve all coas
   static async getAllcoas() {
     /**
     Todo: retrieve all coas from the database using slow loading.
     */
-    try {
-      const pipeline = [
+    try {      
+      const pipeline =[
         {
-          '$sort': {
-            'acct': -1
-          }
+          $sort: { _id: -1 }
         }
       ];
-
       // Use a more durable Read Concern here to make sure this data is not stale.
-      const readConcern = "majority"; //coas.readConcern
-
-      const aggregateResult = await coas.aggregate(pipeline, {
-        readConcern
-      });
-
+      const readConcern = "majority";
+      const aggregateResult = await coas.aggregate(pipeline, {readConcern});
       return await aggregateResult.toArray();
 
     } catch (e) {

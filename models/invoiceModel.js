@@ -170,12 +170,8 @@ export default class invoiceModel {
       ];
 
       // Use a more durable Read Concern here to make sure this data is not stale.
-      const readConcern = "majority"; //invoices.readConcern
-
-      const aggregateResult = await invoices.aggregate(pipeline, {
-        readConcern
-      });
-
+      const readConcern = "majority";
+      const aggregateResult = await invoices.aggregate(pipeline, {readConcern});
       return await aggregateResult.toArray();
 
     } catch (e) {

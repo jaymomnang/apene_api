@@ -1,4 +1,4 @@
-import COA from "../models/COAModel"
+import COA from "../models/COAModel";
 
 const _PAGE = 20;
 
@@ -8,6 +8,8 @@ export default class COAController {
     let totalNumItems 
     const COAList = await COA.getAllcoas()
     totalNumItems = COAList.length
+
+    let id = req;
 
     let response = {
       COA: COAList,

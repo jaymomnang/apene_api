@@ -28,7 +28,7 @@ process.env.NODE_ENV !== "prod" && app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const port = process.env.PORT || 3100;
+const port = process.env.PORT || 5000;
 // Register api routes
 app.use("/", routes);
 app.use("*", (req, res) => res.status(404).json({ error: "not found" }));
