@@ -20,7 +20,7 @@ export default class usersController {
 
   static async getuserById(req, res) {
     try {
-      let id = req.params.email || {}
+      let email = req.params.email || {}
       let user = await users.getuserById(email)
       if (!user) {
         res.status(404).json({ error: "Not found" })
@@ -37,7 +37,7 @@ export default class usersController {
   static async getuser(req, res) {
     try {
       let email = req.params.email || {}
-      let token = req.params.email || {}
+      let token = req.params.token || {}
 
       let user = await users.getUser(email, token)
       if (!user) {
