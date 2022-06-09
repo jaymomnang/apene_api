@@ -22,7 +22,8 @@ router.route("/settings/config-options").get(appSettingsCTRL.getConfig)
 router.route("/people/").get(usersCTRL.getusers)
 router.route("/people/search").get(usersCTRL.searchusers)
 router.route("/people/facet-search").get(usersCTRL.facetedSearch)
-router.route("/people/id/:email").get(usersCTRL.getuserById)
+router.route("/people/getuser/:email").get(usersCTRL.getuserById)
+router.route("/people/auth/:email&:token").get(usersCTRL.getuser)
 router.route("/people/config-options").get(usersCTRL.getConfig)
 
 // routes for invoices

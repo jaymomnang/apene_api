@@ -1,5 +1,4 @@
 import users from "../models/usersModel"
-
 const _PAGE = 20;
 
 export default class usersController {
@@ -21,8 +20,8 @@ export default class usersController {
 
   static async getuserById(req, res) {
     try {
-      let id = req.params.id || {}
-      let user = await users.getuserByID(id)
+      let id = req.params.email || {}
+      let user = await users.getuserById(email)
       if (!user) {
         res.status(404).json({ error: "Not found" })
         return
@@ -34,6 +33,25 @@ export default class usersController {
       res.status(500).json({ error: e })
     }
   }
+
+  static async getuser(req, res) {
+    try {
+      let email = req.params.email || {}
+      let token = req.params.email || {}
+
+      let user = await users.getUser(email, token)
+      if (!user) {
+        res.status(404).json({ error: "Not found" })
+        return
+      }
+      let updated_type = user.lastupdated instanceof Date ? "Date" : "other"
+      res.json({ user, updated_type })
+    } catch (e) {
+      console.log(`api, ${e}`)
+      res.status(500).json({ error: e })
+    }
+  }
+
 
   static async searchusers(req, res) {
     let page

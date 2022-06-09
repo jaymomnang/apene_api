@@ -157,15 +157,16 @@ export default class userModel {
   }
 
   //retrieve a specific user account
-  static async getUser(email, pwd, sl) {
+  static async getUser(email, token) {
     /**
-    Todo: retrieve a specific user account.
+    Todo: 1. retrieve a specific user account.
+    2. use the sl to decrypt the pwd
     */
     try {
       // Return the matching user account.
       const pipeline = [
         {
-          $match: {email: email, pwd: pwd, sl: sl}
+          $match: {email: email, pwd: token}
         }
       ];
 
@@ -182,6 +183,36 @@ export default class userModel {
       return { error: e };
     }
   }
+
+
+//retrieve a specific user account by their id/email
+static async getuserById(email) {
+  /**
+  Todo: 1. retrieve a specific user account.
+  2. use the sl to decrypt the pwd
+  */
+  try {
+    // Return the matching user account.
+    const pipeline = [
+      {
+        $match: {email: email}
+      }
+    ];
+
+    // Use a more durable Read Concern here to make sure this data is not stale.
+    const readConcern = "majority"; //users.readConcern
+
+    const aggregateResult = await users.aggregate(pipeline, {
+      readConcern
+    });
+
+    return await aggregateResult.toArray();
+  } catch (e) {
+    console.error(`Unable to retrieve users: ${e}`);
+    return { error: e };
+  }
+}
+
 
   static async getusers() {
     /**
