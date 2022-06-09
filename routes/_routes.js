@@ -1,10 +1,10 @@
 import { Router } from "express"
-import appSettingsCTRL from "../controllers/AppSettingController"
-import usersCTRL from "../controllers/userController"
-import invoicesCTRL from "../controllers/invoiceController"
-import coaCTRL from "../controllers/COAController"
-import budgetCTRL from "../controllers/budgetController"
-import budgetStateCTRL from "../controllers/budgetStateController"
+import appSettingsCTRL from "../controllers/AppSettingController.js"
+import usersCTRL from "../controllers/userController.js"
+import invoicesCTRL from "../controllers/invoiceController.js"
+import coaCTRL from "../controllers/COAController.js"
+import budgetCTRL from "../controllers/budgetController.js"
+import budgetStateCTRL from "../controllers/budgetStateController.js"
 
 const router = new Router()
 

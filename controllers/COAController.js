@@ -1,4 +1,4 @@
-import COA from "../models/COAModel";
+import COA from "../models/COAModel.js";
 
 const _PAGE = 20;
 

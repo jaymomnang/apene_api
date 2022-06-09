@@ -1,4 +1,4 @@
-import budgetState from "../models/budgetStateModel"
+import budgetState from "../models/budgetStateModel.js"
 
 const _PAGE = 20;
 

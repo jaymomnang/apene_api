@@ -1,4 +1,4 @@
-import projects from "../models/projectsModel"
+import projects from "../models/projectsModel.js"
 
 const _PAGE = 20;
 

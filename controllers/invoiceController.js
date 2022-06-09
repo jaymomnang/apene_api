@@ -1,4 +1,4 @@
-import invoices from "../models/invoiceModel"
+import invoices from "../models/invoiceModel.js"
 
 const _PAGE = 20;
 

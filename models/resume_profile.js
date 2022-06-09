@@ -1,5 +1,5 @@
 /*global process*/
-import globalOps from "../misc/globalOps";
+import globalOps from "../misc/globalOps.js";
 
 let resume_profile;
 let _ns;

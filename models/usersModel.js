@@ -1,6 +1,6 @@
 
 /*global process*/
-import globalOps from "../misc/globalOps";
+import globalOps from "../misc/globalOps.js";
 
 let users;
 let _ns;

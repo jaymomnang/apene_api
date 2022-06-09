@@ -1,4 +1,4 @@
-import budget from "../models/budgetModel"
+import budget from "../models/budgetModel.js"
 
 const _PAGE = 20;
 

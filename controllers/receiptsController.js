@@ -1,4 +1,4 @@
-import receipts from "../models/receiptsModel"
+import receipts from "../models/receiptsModel.js"
 
 const _PAGE = 20;
 

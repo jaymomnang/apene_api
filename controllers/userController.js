@@ -1,4 +1,4 @@
-import users from "../models/usersModel"
+import users from "../models/usersModel.js"
 const _PAGE = 20;
 
 export default class usersController {

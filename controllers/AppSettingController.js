@@ -1,4 +1,4 @@
-import appSettings from "../models/AppSettingModel"
+import appSettings from "../models/AppSettingModel.js"
 
 const _PAGE = 20;
 
