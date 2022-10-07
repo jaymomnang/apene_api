@@ -1,5 +1,4 @@
 /*global process*/
-
 import 'dotenv/config';
 import MongoClient from "mongodb";
 import express from "express";

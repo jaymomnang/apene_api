@@ -1,8 +1,11 @@
 /* mySeedScript.js */
 
 // require the necessary libraries
-const faker = require("faker");
-const MongoClient = require("mongodb").MongoClient;
+import faker from "faker";
+import MongoClient from "mongodb";
+
+//const faker = require("faker");
+//const MongoClient = require("mongodb").MongoClient;
 
 function randomIntFromInterval(min, max) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
