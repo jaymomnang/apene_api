@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Apene API",
   "main": "index.js",  
+  "type": "module",
   "scripts": {
     "start": "nodemon -r esm index.js --inspect-brk --inspect=27.0.0.1:5000",
     "test": "jest --passWithNoTests",
