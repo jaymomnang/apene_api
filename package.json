@@ -12,6 +12,7 @@
     "changestream:insert": "node test/lessons/change-insert.js"
   },
   "dependencies": {
+    "apene_api": "file:",
     "consolidate": "^0.13.1",
     "cors": "^2.8.5",
     "dotenv": "^8.6.0",
