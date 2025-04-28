@@ -52,6 +52,39 @@ export default class usersController {
     }
   }
 
+  static async signup(req, res) {
+    try {
+      const { email, firstname, lastname, pwd, companyname, business } = req.body;
+
+      if (!email || !firstname || !lastname || !pwd) {
+        res.status(400).json({ error: "All fields are required" });
+        return;
+      }
+
+      const existingUser = await users.getuserById(email);
+      if (existingUser) {
+        res.status(400).json({ error: "User already exists" });
+        return;
+      }
+
+      const newUser = {
+        email,
+        firstname,
+        lastname,
+        pwd, // In a real-world scenario, hash the password before saving
+        companyname,
+        business,
+        status: "created",
+        isActive: false
+      };
+
+      const result = await users.createUser(newUser);
+      res.status(201).json({ message: "User created successfully", user: result });
+    } catch (e) {
+      console.error(`Error during signup: ${e}`);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
 
   static async searchusers(req, res) {
     let page

@@ -28,6 +28,8 @@ export default class userModel {
    * @param {string} lastname - The last name of the user.
    * @param {string} pwd - The users's authentication pwd.
    * @param {string} sl - The user's authentication key. 
+   * @param {string} companyname - The user's company name. Place of work. 
+   * @param {string} business - business sector. 
    * @param {string} dateCreated - Date user account was created.
    * @param {Boolean} isActive - A switch to indicate if user account has been activated.
    * @param {string} lastLoginDate - The date the user logged in last.
@@ -41,24 +43,28 @@ export default class userModel {
     lastname,
     pwd,
     sl,
-    dateCreated,
+    companyname,
+    business,
     isActive,
-    lastLoginDate,
     status,
     roles
   ) {
     try {
       // TODO: Create user account
+      sl = globalOps.generateRandomString();      
+
       // Construct the user document to be inserted.
       const userDoc = {
         email: email,
         firstname: firstname,
         lastname: lastname,
-        pwd: pwd,
-        sl: sl,
-        dateCreated: dateCreated,
+        sl: globalOps.generateRandomString(),
+        pwd: globalOps.hashText(pwd, sl),
+        companyname: companyname,
+        business: business,
+        dateCreated: globalOps.currentDateTime(),
         isActive: isActive,
-        lastLoginDate: lastLoginDate,
+        lastLoginDate: globalOps.currentDateTime(),
         status: status,
         roles: roles
       };

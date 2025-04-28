@@ -20,6 +20,7 @@ router.route("/settings/config-options").get(appSettingsCTRL.getConfig)
 
 // routes for app users
 router.route("/people/").get(usersCTRL.getusers)
+router.route("/signup/").post(usersCTRL.signup)
 router.route("/people/search").get(usersCTRL.searchusers)
 router.route("/people/facet-search").get(usersCTRL.facetedSearch)
 router.route("/people/getuser/:email").get(usersCTRL.getuserById)

@@ -1,4 +1,9 @@
+import crypto from 'crypto';
+
+
 export default class globalOps {
+
+  static length = 64; //default length of random string`
   
   //return current date time.
   static currentDateTime() {
@@ -19,4 +24,16 @@ export default class globalOps {
     ct_ = str.concat(dd, '/', mm, '/', yyyy, " ", hrs, ":", min);
     return ct_;
   }
+
+  static hashText = function (text, key) {
+    const hmac = crypto.createHmac('sha256', key);
+    hmac.update(text);
+    return hmac.digest('hex');
+  };
+  
+  static generateRandomString = function (length) {
+    return crypto.randomBytes(length).toString('hex');
+  };
+
 }
+
