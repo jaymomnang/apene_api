@@ -1,4 +1,5 @@
 import users from "../models/usersModel.js"
+import globalOps from "../misc/globalOps.js";
 const _PAGE = 20;
 
 export default class usersController {
@@ -39,13 +40,20 @@ export default class usersController {
       let email = req.params.email || {}
       let token = req.params.token || {}
 
-      let user = await users.getUser(email, token)
+      let user = await users.getuserById(email)
       if (!user) {
         res.status(404).json({ error: "Not found" })
         return
       }
-      let updated_type = user.lastupdated instanceof Date ? "Date" : "other"
-      res.json({ user, updated_type })
+      let tk = globalOps.hashText(token, user[0].sl)
+      if (tk == user[0].pwd) {
+        let updated_type = user.lastupdated instanceof Date ? "Date" : "other"
+        res.json({ user, updated_type })
+      }else{
+        res.status(404).json({ error: "User authentication failed!" })
+        return
+      }
+      
     } catch (e) {
       console.log(`api, ${e}`)
       res.status(500).json({ error: e })
@@ -62,23 +70,28 @@ export default class usersController {
       }
 
       const existingUser = await users.getuserById(email);
-      if (existingUser) {
+      if (existingUser.length > 0) {
         res.status(400).json({ error: "User already exists" });
         return;
       }
 
-      const newUser = {
-        email,
-        firstname,
-        lastname,
-        pwd, // In a real-world scenario, hash the password before saving
-        companyname,
-        business,
+      let salt = globalOps.generateRandomString(64);
+      let _pwd = globalOps.hashText(pwd, salt);
+
+      const u = {
+        email: email,
+        firstname: firstname,
+        lastname: lastname,
+        sl: salt,
+        pwd: _pwd, // In a real-world scenario, hash the password before saving
+        companyname: companyname,
+        business: business,
         status: "created",
-        isActive: false
+        isActive: false,
+        roles: ["user", "companyadmin"] // Default role for new users
       };
 
-      const result = await users.createUser(newUser);
+      const result = await users.adduser(u.email, u.firstname, u.lastname, u.pwd, u.sl, u.companyname, u.business, u.isActive, u.status, u.roles);
       res.status(201).json({ message: "User created successfully", user: result });
     } catch (e) {
       console.error(`Error during signup: ${e}`);

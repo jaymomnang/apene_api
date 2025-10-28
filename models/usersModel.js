@@ -50,16 +50,15 @@ export default class userModel {
     roles
   ) {
     try {
-      // TODO: Create user account
-      sl = globalOps.generateRandomString();      
+     
 
       // Construct the user document to be inserted.
       const userDoc = {
         email: email,
         firstname: firstname,
         lastname: lastname,
-        sl: globalOps.generateRandomString(),
-        pwd: globalOps.hashText(pwd, sl),
+        sl: sl,
+        pwd: pwd,
         companyname: companyname,
         business: business,
         dateCreated: globalOps.currentDateTime(),

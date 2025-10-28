@@ -3,8 +3,7 @@ import crypto from 'crypto';
 
 export default class globalOps {
 
-  static length = 64; //default length of random string`
-  
+  static length = 64; //default length of random string`  
   //return current date time.
   static currentDateTime() {
     let ct_ = new Date();
