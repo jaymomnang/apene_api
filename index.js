@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/", routes);
-app.use("*", (req, res) => res.status(404).json({ error: "not found" }));
+app.use((req, res) => res.status(404).json({ error: "not found" }));
 
 // Database configuration
 const dbName = process.env.DB_NAME || "db"; // 👈 You can set DB_NAME in .env

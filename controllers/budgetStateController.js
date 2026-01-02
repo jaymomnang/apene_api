@@ -20,12 +20,8 @@ export default class budgetStateController {
   }
 
   static async getCostCenterByID(req, res) {
-    let budgetID = Array.isArray(req.query.budgetID)
-      ? req.query.budgetID
-      : Array(req.query.budgetID)
-    let id = Array.isArray(req.query.id)
-      ? req.query.id
-      : Array(req.query.id)
+    let budgetID = req.params.budgetID
+    let id = req.params.id
     let costcenter = await budgetState.getCostCenterByID(budgetID, id)
     let response = {
       costcenter: costcenter,

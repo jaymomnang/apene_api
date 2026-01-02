@@ -53,7 +53,7 @@ router.route("/bs/").get(budgetStateCTRL.getbudgetStates)
 router.route("/bs/search").get(budgetStateCTRL.searchbudgetState)
 router.route("/bs/facet-search").get(budgetStateCTRL.facetedSearch)
 router.route("/bs/id/:id").get(budgetStateCTRL.getbudgetStateByID)
-router.route("/bs/cc/:budgetID:id").get(budgetStateCTRL.getCostCenterByID)
+router.route("/bs/cc/:budgetID/:id").get(budgetStateCTRL.getCostCenterByID)
 router.route("/bs/config-options").get(budgetStateCTRL.getConfig)
 
 
