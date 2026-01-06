@@ -5,7 +5,7 @@ const _PAGE = 20;
 export default class appSettingsController {
   static async getAppSettings(req, res) {
 
-    let totalNumItems 
+    let totalNumItems
     const appSettingsList = await appSettings.getAllsettings()
     totalNumItems = appSettingsList.length
 
@@ -18,17 +18,6 @@ export default class appSettingsController {
     }
     res.json(response)
   }
-
-  // static async getAppSettingsByCountry(req, res, next) {
-  //   let countries = Array.isArray(req.query.countries)
-  //     ? req.query.countries
-  //     : Array(req.query.countries)
-  //   let appSettingsList = await appSettings.getAppSettingsByCountry(countries)
-  //   let response = {
-  //     settings: appSettingsList,
-  //   }
-  //   res.json(response)
-  // }
 
   static async getAppSettingById(req, res) {
     try {
@@ -44,6 +33,56 @@ export default class appSettingsController {
       console.log(`api, ${e}`)
       res.status(500).json({ error: e })
     }
+  }
+
+  static async addNewSetting(req, res) {
+    try {
+      const { key, name, value, valueDescription, isValueRange, startingRange, endingRange, user } = req.body;
+
+      if (!key || !name || !value || !valueDescription || !isValueRange) {
+        res.status(400).json({ error: "All fields are required" });
+        return;
+      }
+
+      const existingSetting = await appSettings.getSettingById(key);
+      if (existingSetting.length > 0) {
+        res.status(400).json({ error: "Setting already exists" });
+        return;
+      }
+
+      key = await this.getNewKey();
+      let dt = globalOps.currentDateTime();
+
+      const u = {
+        key: key,
+        name: name,
+        value: value,
+        valueDescription: valueDescription,
+        isValueRange: isValueRange,
+        startingRange: startingRange,
+        endingRange: endingRange,
+        status: "active",
+        createdBy: user,
+        updatedBy: user,
+        dateCreated: dt,
+        dateUpdated: dt
+      };
+
+      const result = await appSettings.addSetting(u);
+      res.status(201).json({ message: "Setting created successfully", setting: result });
+    } catch (e) {
+      console.error(`Error during signup: ${e}`);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
+  // get the last key from the settings collection and increment by 1
+  static async getNewKey() {
+    const lastSetting = await appSettings.getLastSetting();
+    if (lastSetting && lastSetting.key) {
+      return globalOps.getNewID(lastSetting.key);
+    }
+    return 1;
   }
 
   static async searchAppSettings(req, res) {

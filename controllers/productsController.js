@@ -1,16 +1,16 @@
-import invoices from "../models/invoiceModel.js"
+import products from "../models/productsModel.js"
 
 const _PAGE = 20;
 
-export default class invoicesController {
-  static async getInvoices(req, res) {
+export default class productsController {
+  static async getProducts(req, res) {
 
     let totalNumItems 
-    const invoicesList = await invoices.getAllInvoices()
-    totalNumItems = invoicesList.length
-
+    const productsList = await products.getAllProducts()
+    totalNumItems = productsList.length
+    
     let response = {
-      invoices: invoicesList,
+      products: productsList,
       page: 0,
       filters: {},
       items_per_page: _PAGE,
@@ -19,23 +19,23 @@ export default class invoicesController {
     res.json(response)
   }
 
-  static async getinvoiceById(req, res) {
+  static async getProductById(req, res) {
     try {
       let id = req.params.id || {}
-      let invoice = await invoices.getInvoiceById(id)
-      if (!invoice) {
+      let product = await products.getProductById(id)
+      if (!product ) {
         res.status(404).json({ error: "Not found" })
         return
       }
-      let updated_type = invoice.lastupdated instanceof Date ? "Date" : "other"
-      res.json({ invoice, updated_type })
+      let updated_type = product.lastupdated instanceof Date ? "Date" : "other"
+      res.json({ product, updated_type })
     } catch (e) {
       console.log(`api, ${e}`)
       res.status(500).json({ error: e })
     }
   }
 
-  static async searchinvoices(req, res) {
+  static async searchProducts(req, res) {
     let page
     try {
       page = req.query.page ? parseInt(req.query.page, 10) : 0
@@ -66,7 +66,7 @@ export default class invoicesController {
       // nothing to do
     }
 
-    const { invoicesList, totalNumItems } = await invoices.getAllInvoices({
+    const { productsList, totalNumItems } = await products.getAllProducts({
       filters,
       page,
       _PAGE,
@@ -94,12 +94,12 @@ export default class invoicesController {
     }
 
     if (!req.query.cast) {
-      return this.searchinvoices(req, res, next)
+      return this.searchProducts(req, res, next)
     }
 
     const filters = { cast: req.query.cast }
 
-    const facetedSearchResult = await invoices.facetedSearch({
+    const facetedSearchResult = await products.facetedSearch({
       filters,
       page,
       _PAGE,
@@ -121,7 +121,7 @@ export default class invoicesController {
   }
 
   static async getConfig(req, res) {
-    const { poolSize, wtimeout, authInfo } = await invoices.getConfiguration()
+    const { poolSize, wtimeout, authInfo } = await products.getConfiguration()
     try {
       let response = {
         pool_size: poolSize,

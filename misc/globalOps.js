@@ -34,5 +34,9 @@ export default class globalOps {
     return crypto.randomBytes(length).toString('hex');
   };
 
+  static getNewID = function (lastnumber) {
+    return lastnumber + 1;
+  }
+
 }
 

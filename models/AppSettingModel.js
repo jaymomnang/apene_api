@@ -19,36 +19,55 @@ export default class settingModel {
   }
 
   /**
-   * Inserts an setting into the `settings` collection, with the following fields:
-   * @param {string} settingID - The _id of the setting in the `settings` collection.
-   * @param {string} name - The name of the settings.
-   * @param {string} description - The long description of the settings.
-   * @param {Object} values - An object containing the detailed values of the settings.
-   * @param {Boolean} isActive - A switch to turn on/off the setting.
-   * @param {string} dateUpdated - The date on which the setting was last updated.
-   * @param {Object} updateBy - The user that last updated the setting.
-   * @returns {DAOResponse} Returns an object with either DB response or "error"
-   */
+  * Inserts an setting into the `settings` collection, with the following fields:
+  * @param {string} key - The _id of the setting in the `settings` collection.
+  * @param {string} name - The name of the settings.
+  * @param {string} value - The value of the setting. 
+  * @param {string} valueDescription - The long description of the settings.
+  * @param {Boolean} isValueRange - Check if the setting has a range of values.
+  * @param {string} startingRange - The starting value range of the setting. 
+  * @param {string} endingRange - The ending value range of the setting. 
+  * @param {Boolean} isActive - A switch to turn on/off the setting.
+  * @param {string} dateUpdated - The date the setting was last updated.
+  * @param {Object} updatedBy - The user that last updated the setting.
+  * @param {string} dateCreated - The date the setting was created.
+  * @param {Object} createdBy - The user that created the setting.
+  * @returns {DAOResponse} Returns an object with either DB response or "error"
+  */
   static async addsetting(
-    settingID,
-    name,
-    description,
-    values,
+    key,
+    name,    
+    value,
+    valueDescription,
+    isValueRange,
+    startingRange,
+    endingRange,
     isActive,
     dateUpdated,
-    updateBy
+    updateBy,
+    dateCreated,
+    createdBy
   ) {
     try {
       // TODO: Create/Update settings
       // Construct the setting document to be inserted.
+
+      dateCreated = globalOps.currentDateTime();
+      dateUpdated = globalOps.currentDateTime();
+
       const settingDoc = {
-        settingID: settingID,
+        key: key,
         name: name,
-        description: description,
-        values: values,
+        valueDescription: valueDescription,
+        values: value,
+        isValueRange: isValueRange,
+        startingRange: startingRange,
+        endingRange: endingRange,
         isActive: isActive,
         dateUpdated: dateUpdated,
-        updateBy: updateBy
+        updateBy: updateBy,
+        dateCreated: dateCreated,
+        createdBy: createdBy
       };
 
       return await settings.insertOne(settingDoc, { w: "majority" });
@@ -60,41 +79,52 @@ export default class settingModel {
 
   /**
    * Updates the setting in the setting collection.
-   * @param {string} settingID - The _id of the setting in the `settings` collection.
+   * @param {string} key - The _id of the setting in the `settings` collection.
    * @param {string} name - The name of the settings.
-   * @param {string} description - The long description of the settings.
-   * @param {Object} values - An object containing the detailed values of the settings.
+   * @param {string} value - The value of the setting. 
+   * @param {string} valueDescription - The long description of the settings.
+   * @param {Boolean} isValueRange - Check if the setting has a range of values.
+   * @param {string} startingRange - The starting value range of the setting. 
+   * @param {string} endingRange - The ending value range of the setting. 
    * @param {Boolean} isActive - A switch to turn on/off the setting.
    * @param {string} dateUpdated - The date on which the setting was last updated.
    * @param {Object} updateBy - The user that last updated the setting.
    * @returns {DAOResponse} Returns an object with either DB response or "error"
    */
   static async updatesetting(
-    settingID,
-    description,
-    values,
+    key,
+    name,
+    value,
+    valueDescription,
+    isValueRange,
+    startingRange,
+    endingRange,
     isActive,
-    user
+    dateUpdated,
+    updateBy
   ) {
     try {
       // TODO: Create/Update settings
       // Use the settingId and status to select the proper setting, then update.
 
-      let date_upd = globalOps.currentDateTime();
+      dateUpdated = globalOps.currentDateTime();
 
       const updateResponse = await settings.updateOne(
-        { settingID: settingID },
+        { key: key },
         {
           $set: {
-            description: description,
-            values: values,
+            valueDescription: valueDescription,
+            value: value,
+            isValueRange: isValueRange,
+            startingRange: startingRange,
+            endingRange: endingRange,
+            name: name,            
             isActive: isActive,
-            dateUpdated: date_upd,
-            updateBy: user
+            dateUpdated: dateUpdated,
+            updateBy: updateBy
           }
         }
       );
-
       return updateResponse;
     } catch (e) {
       console.error(`Unable to update setting: ${e}`);
@@ -111,7 +141,7 @@ export default class settingModel {
     try {
       // TODO Ticket: deactivate setting
       const deleteResponse = await settings.updateOne(
-        { settingID: settingID},
+        { settingID: settingID },
         { $set: { isActive: false } }
       );
 
@@ -146,6 +176,17 @@ export default class settingModel {
 
     } catch (e) {
       console.error(`Unable to retrieve settings: ${e}`);
+      return { error: e };
+    }
+  }
+
+  // get the last setting by key
+  static async getLastSetting() {
+    try {
+      const lastSetting = await settings.find().sort({ key: -1 }).limit(1).toArray();
+      return lastSetting[0] || null;
+    } catch (e) {
+      console.error(`Unable to get last setting: ${e}`);
       return { error: e };
     }
   }

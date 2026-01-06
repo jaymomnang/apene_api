@@ -1,6 +1,6 @@
 /*global process*/
 import 'dotenv/config';
-import MongoClient from "mongodb";
+import { MongoClient } from "mongodb";
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
@@ -9,6 +9,7 @@ import morgan from "morgan";
 import routes from "./routes/_routes.js";
 import invoices from "./models/invoiceModel.js";
 import budgets from "./models/budgetModel.js";
+import products from "./models/productsModel.js";
 import COA from "./models/COAModel.js";
 import projects from "./models/projectsModel.js";
 import settings from "./models/AppSettingModel.js";
@@ -30,24 +31,23 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/", routes);
 app.use((req, res) => res.status(404).json({ error: "not found" }));
 
-// Database configuration
-const dbName = process.env.DB_NAME || "db"; // 👈 You can set DB_NAME in .env
-
 // Start server
 const startServer = async () => {
   try {
-    const client = await MongoClient.connect(process.env.DB_URI, {
+    const client = new MongoClient(process.env.DB_URI, {
       maxPoolSize: 50,
       socketTimeoutMS: 2500,
     });
+    await client.connect();
 
-    const db = client; //.db(dbName); // 👈 explicitly select the database
+    const db = client; // explicitly select the database
 
     // Inject DB into models
     await invoices.injectDB(db);
     await budgets.injectDB(db);
     await COA.injectDB(db);
     await projects.injectDB(db);
+    await products.injectDB(db);
     await settings.injectDB(db);
     await receipts.injectDB(db);
     await resume_profile.injectDB(db);

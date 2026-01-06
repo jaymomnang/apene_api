@@ -2,6 +2,7 @@ import { Router } from "express"
 import appSettingsCTRL from "../controllers/AppSettingController.js"
 import usersCTRL from "../controllers/userController.js"
 import invoicesCTRL from "../controllers/invoiceController.js"
+import productsCTRL from "../controllers/productsController.js"
 import coaCTRL from "../controllers/COAController.js"
 import budgetCTRL from "../controllers/budgetController.js"
 import budgetStateCTRL from "../controllers/budgetStateController.js"
@@ -13,6 +14,7 @@ router.route("/").get(appSettingsCTRL.getAppSettings)
 
 // routes for app settings
 router.route("/settings/").get(appSettingsCTRL.getAppSettings)
+router.route("/settings/").post(appSettingsCTRL.addNewSetting)
 router.route("/settings/search").get(appSettingsCTRL.searchAppSettings)
 router.route("/settings/facet-search").get(appSettingsCTRL.facetedSearch)
 router.route("/settings/id/:id").get(appSettingsCTRL.getAppSettingById)
@@ -33,6 +35,13 @@ router.route("/inv/search").get(invoicesCTRL.searchinvoices)
 router.route("/inv/facet-search").get(invoicesCTRL.facetedSearch)
 router.route("/inv/id/:id").get(invoicesCTRL.getinvoiceById)
 router.route("/inv/config-options").get(invoicesCTRL.getConfig)
+
+// routes for products
+router.route("/products/").get(productsCTRL.getProducts)
+router.route("/products/search").get(productsCTRL.searchProducts)
+router.route("/products/facet-search").get(productsCTRL.facetedSearch)
+router.route("/products/id/:id").get(productsCTRL.getProductById)
+router.route("/products/config-options").get(productsCTRL.getConfig)
 
 // routes for charts of accounts
 router.route("/coa/").get(coaCTRL.getCOA)
