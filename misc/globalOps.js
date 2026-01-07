@@ -34,8 +34,12 @@ export default class globalOps {
     return crypto.randomBytes(length).toString('hex');
   };
 
+  /// Generate a new ID based on the last ID
   static getNewID = function (lastnumber) {
-    return lastnumber + 1;
+    const numPart = lastnumber.replace(/\D/g, ''); // Extract numeric part
+    const prefixPart = lastnumber.replace(/\d/g, ''); // Extract prefix part
+    const newNumber = parseInt(numPart) + 1;
+    return prefixPart + newNumber.toString().padStart(numPart.length, '0');
   }
 
 }

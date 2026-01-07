@@ -37,7 +37,7 @@ export default class userModel {
    * @param {Object} roles - The roles and permission applied to the user account.
    * @returns {DAOResponse} Returns an object with either DB response or "error"
    */
-  static async adduser(
+  static async addUser(
     email,
     firstname,
     lastname,
@@ -47,7 +47,9 @@ export default class userModel {
     business,
     isActive,
     status,
-    roles
+    roles,
+    dateCreated,
+    dateUpdated
   ) {
     try {
      
@@ -61,9 +63,10 @@ export default class userModel {
         pwd: pwd,
         companyname: companyname,
         business: business,
-        dateCreated: globalOps.currentDateTime(),
+        dateCreated: dateCreated,
+        dateUpdated: dateUpdated,
         isActive: isActive,
-        lastLoginDate: globalOps.currentDateTime(),
+        lastLoginDate: dateCreated,
         status: status,
         roles: roles
       };
@@ -83,7 +86,7 @@ export default class userModel {
    * @param {Object} status - The status of the user account.
    * @returns {DAOResponse} Returns an object with either DB response or "error"
    */
-  static async updateuser(
+  static async updateUser(
     email,
     pwd,
     isActive,

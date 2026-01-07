@@ -18,6 +18,7 @@ router.route("/settings/").post(appSettingsCTRL.addNewSetting)
 router.route("/settings/search").get(appSettingsCTRL.searchAppSettings)
 router.route("/settings/facet-search").get(appSettingsCTRL.facetedSearch)
 router.route("/settings/id/:id").get(appSettingsCTRL.getAppSettingById)
+router.route("/settings/id/:id").post(appSettingsCTRL.updateSetting)
 router.route("/settings/config-options").get(appSettingsCTRL.getConfig)
 
 // routes for app users

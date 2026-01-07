@@ -27,14 +27,14 @@ export default class settingModel {
   * @param {Boolean} isValueRange - Check if the setting has a range of values.
   * @param {string} startingRange - The starting value range of the setting. 
   * @param {string} endingRange - The ending value range of the setting. 
-  * @param {Boolean} isActive - A switch to turn on/off the setting.
+  * @param {String} status - A switch to turn on/off the setting.
   * @param {string} dateUpdated - The date the setting was last updated.
   * @param {Object} updatedBy - The user that last updated the setting.
   * @param {string} dateCreated - The date the setting was created.
   * @param {Object} createdBy - The user that created the setting.
   * @returns {DAOResponse} Returns an object with either DB response or "error"
   */
-  static async addsetting(
+  static async addSetting(
     key,
     name,    
     value,
@@ -42,7 +42,7 @@ export default class settingModel {
     isValueRange,
     startingRange,
     endingRange,
-    isActive,
+    status,
     dateUpdated,
     updateBy,
     dateCreated,
@@ -51,19 +51,15 @@ export default class settingModel {
     try {
       // TODO: Create/Update settings
       // Construct the setting document to be inserted.
-
-      dateCreated = globalOps.currentDateTime();
-      dateUpdated = globalOps.currentDateTime();
-
       const settingDoc = {
         key: key,
         name: name,
         valueDescription: valueDescription,
-        values: value,
+        value: value,
         isValueRange: isValueRange,
         startingRange: startingRange,
         endingRange: endingRange,
-        isActive: isActive,
+        status: status,
         dateUpdated: dateUpdated,
         updateBy: updateBy,
         dateCreated: dateCreated,
@@ -86,12 +82,12 @@ export default class settingModel {
    * @param {Boolean} isValueRange - Check if the setting has a range of values.
    * @param {string} startingRange - The starting value range of the setting. 
    * @param {string} endingRange - The ending value range of the setting. 
-   * @param {Boolean} isActive - A switch to turn on/off the setting.
+   * @param {String} status - A switch to turn on/off the setting.
    * @param {string} dateUpdated - The date on which the setting was last updated.
    * @param {Object} updateBy - The user that last updated the setting.
    * @returns {DAOResponse} Returns an object with either DB response or "error"
    */
-  static async updatesetting(
+  static async updateSetting(
     key,
     name,
     value,
@@ -99,15 +95,13 @@ export default class settingModel {
     isValueRange,
     startingRange,
     endingRange,
-    isActive,
+    status,
     dateUpdated,
     updateBy
   ) {
     try {
       // TODO: Create/Update settings
       // Use the settingId and status to select the proper setting, then update.
-
-      dateUpdated = globalOps.currentDateTime();
 
       const updateResponse = await settings.updateOne(
         { key: key },
@@ -119,7 +113,7 @@ export default class settingModel {
             startingRange: startingRange,
             endingRange: endingRange,
             name: name,            
-            isActive: isActive,
+            status: status,
             dateUpdated: dateUpdated,
             updateBy: updateBy
           }
@@ -133,7 +127,7 @@ export default class settingModel {
   }
 
   //deactivate a specific setting
-  static async deletesetting(settingID) {
+  static async deleteSetting(key) {
     /**
     Ticket: deactivate setting. Only active settings can be deactivated.
     */
@@ -141,8 +135,8 @@ export default class settingModel {
     try {
       // TODO Ticket: deactivate setting
       const deleteResponse = await settings.updateOne(
-        { settingID: settingID },
-        { $set: { isActive: false } }
+        { key: key },
+        { $set: { status: "suspended" } }
       );
 
       return deleteResponse;
@@ -154,14 +148,14 @@ export default class settingModel {
 
 
   //retrieve all settings
-  static async getAllsettings() {
+  static async getAllSettings() {
     /**
     Todo: retrieve all settings from the database using slow loading. Limit to first 20
     */
     try {
       const pipeline = [
         {
-          $sort: { settingID: -1 }
+          $sort: { key: -1 }
         }
       ];
 
@@ -176,6 +170,28 @@ export default class settingModel {
 
     } catch (e) {
       console.error(`Unable to retrieve settings: ${e}`);
+      return { error: e };
+    }
+  }
+
+  //retrieve an setting using the key
+  static async getSettingById(Id) {   
+    try {
+      const pipeline = [
+        {
+          $match: { key: Id }
+        }
+      ];
+
+      // Use a more durable Read Concern here to make sure this data is not stale.
+      const readConcern = "majority"; //settings.readConcern
+      const aggregateResult = await settings.aggregate(pipeline, {
+        readConcern
+      });
+
+      return await aggregateResult.toArray();
+    } catch (e) {
+      console.error(`Unable to get setting: ${e}`);
       return { error: e };
     }
   }

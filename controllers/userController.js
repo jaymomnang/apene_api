@@ -74,24 +74,13 @@ export default class usersController {
         res.status(400).json({ error: "User already exists" });
         return;
       }
-
+      
       let salt = globalOps.generateRandomString(64);
       let _pwd = globalOps.hashText(pwd, salt);
+      let dateUpdated = globalOps.currentDateTime();
+      let dateCreated = globalOps.currentDateTime();
 
-      const u = {
-        email: email,
-        firstname: firstname,
-        lastname: lastname,
-        sl: salt,
-        pwd: _pwd, // In a real-world scenario, hash the password before saving
-        companyname: companyname,
-        business: business,
-        status: "created",
-        isActive: false,
-        roles: ["user", "companyadmin"] // Default role for new users
-      };
-
-      const result = await users.adduser(u.email, u.firstname, u.lastname, u.pwd, u.sl, u.companyname, u.business, u.isActive, u.status, u.roles);
+      const result = await users.addUser(email, firstname, lastname, _pwd, salt, companyname, business, false, "created", ["user"], dateCreated, dateUpdated);
       res.status(201).json({ message: "User created successfully", user: result });
     } catch (e) {
       console.error(`Error during signup: ${e}`);

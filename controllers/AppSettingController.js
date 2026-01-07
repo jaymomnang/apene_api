@@ -1,4 +1,5 @@
 import appSettings from "../models/AppSettingModel.js"
+import globalOps from "../misc/globalOps.js";
 
 const _PAGE = 20;
 
@@ -6,7 +7,7 @@ export default class appSettingsController {
   static async getAppSettings(req, res) {
 
     let totalNumItems
-    const appSettingsList = await appSettings.getAllsettings()
+    const appSettingsList = await appSettings.getAllSettings()
     totalNumItems = appSettingsList.length
 
     let response = {
@@ -35,11 +36,12 @@ export default class appSettingsController {
     }
   }
 
+  /// Add new setting
   static async addNewSetting(req, res) {
     try {
       const { key, name, value, valueDescription, isValueRange, startingRange, endingRange, user } = req.body;
 
-      if (!key || !name || !value || !valueDescription || !isValueRange) {
+      if (!key || !name || !value || !valueDescription || !user) {
         res.status(400).json({ error: "All fields are required" });
         return;
       }
@@ -50,39 +52,49 @@ export default class appSettingsController {
         return;
       }
 
-      key = await this.getNewKey();
+      let k = "";
+
+      const lastSetting = await appSettings.getLastSetting();
+      if (lastSetting && lastSetting.key) {
+        k = globalOps.getNewID(lastSetting.key);
+      } else {
+        k = "APK00001";
+      }
+
       let dt = globalOps.currentDateTime();
 
-      const u = {
-        key: key,
-        name: name,
-        value: value,
-        valueDescription: valueDescription,
-        isValueRange: isValueRange,
-        startingRange: startingRange,
-        endingRange: endingRange,
-        status: "active",
-        createdBy: user,
-        updatedBy: user,
-        dateCreated: dt,
-        dateUpdated: dt
-      };
-
-      const result = await appSettings.addSetting(u);
+      const result = await appSettings.addSetting(k, name, value, valueDescription, isValueRange, startingRange, endingRange, "active", dt, user, dt, user);
       res.status(201).json({ message: "Setting created successfully", setting: result });
     } catch (e) {
-      console.error(`Error during signup: ${e}`);
+      console.error(`Error adding setting: ${e}`);
       res.status(500).json({ error: "Internal server error" });
     }
   }
 
-  // get the last key from the settings collection and increment by 1
-  static async getNewKey() {
-    const lastSetting = await appSettings.getLastSetting();
-    if (lastSetting && lastSetting.key) {
-      return globalOps.getNewID(lastSetting.key);
+  // update existing setting
+  static async updateSetting(req, res) {
+    try {
+      const { key, name, value, valueDescription, isValueRange, startingRange, endingRange, status, user } = req.body;
+
+      if (!key || !name || !value || !valueDescription || !user) {
+        res.status(400).json({ error: "All fields are required" });
+        return;
+      }
+
+      const existingSetting = await appSettings.getSettingById(key);
+      if (existingSetting.length == 0) {
+        res.status(400).json({ error: "Setting does not exists" });
+        return;
+      }
+
+      let dt = globalOps.currentDateTime();
+
+      const result = await appSettings.addSetting(key, name, value, valueDescription, isValueRange, startingRange, endingRange, status, dt, user);
+      res.status(201).json({ message: "Setting updated successfully", setting: result });
+    } catch (e) {
+      console.error(`Error saving setting: ${e}`);
+      res.status(500).json({ error: "Internal server error" });
     }
-    return 1;
   }
 
   static async searchAppSettings(req, res) {
