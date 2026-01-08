@@ -89,10 +89,41 @@ export default class appSettingsController {
 
       let dt = globalOps.currentDateTime();
 
-      const result = await appSettings.addSetting(key, name, value, valueDescription, isValueRange, startingRange, endingRange, status, dt, user);
+      const result = await appSettings.updateSetting(key, name, value, valueDescription, isValueRange, startingRange, endingRange, status, dt, user);
       res.status(201).json({ message: "Setting updated successfully", setting: result });
     } catch (e) {
       console.error(`Error saving setting: ${e}`);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
+  // update existing setting
+  static async deleteSetting(req, res) {
+    try {
+      const { key, user, status } = req.body;
+
+      if (!key || !user) {
+        res.status(400).json({ error: "All fields are required" });
+        return;
+      }
+
+      const existingSetting = await appSettings.getSettingById(key);
+      if (existingSetting.length == 0) {
+        res.status(400).json({ error: "Setting does not exists" });
+        return;
+      }
+
+      let dt = globalOps.currentDateTime();
+
+      const result = await appSettings.deleteSetting(key, status, user, dt);
+      if(status !== "suspended"){
+        res.status(201).json({ message: "Setting activated successfully", setting: result });
+      }else{
+        res.status(201).json({ message: "Setting deactivated successfully", setting: result });
+      }
+      
+    } catch (e) {
+      console.error(`Error activating/deactivating setting: ${e}`);
       res.status(500).json({ error: "Internal server error" });
     }
   }

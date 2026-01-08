@@ -127,7 +127,7 @@ export default class settingModel {
   }
 
   //deactivate a specific setting
-  static async deleteSetting(key) {
+  static async deleteSetting(key, status, user, dateUpdated) {
     /**
     Ticket: deactivate setting. Only active settings can be deactivated.
     */
@@ -136,12 +136,12 @@ export default class settingModel {
       // TODO Ticket: deactivate setting
       const deleteResponse = await settings.updateOne(
         { key: key },
-        { $set: { status: "suspended" } }
+        { $set: { status: status, dateUpdated: dateUpdated, updateBy: user } }
       );
 
       return deleteResponse;
     } catch (e) {
-      console.error(`Unable to void setting: ${e}`);
+      console.error(`Unable to activate/deactivate setting: ${e}`);
       return { error: e };
     }
   }
