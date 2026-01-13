@@ -196,6 +196,28 @@ export default class settingModel {
     }
   }
 
+  //retrieve an setting using the name
+  static async getSettingByName(name) {   
+    try {
+      const pipeline = [
+        {
+          $match: { name: name }
+        }
+      ];
+
+      // Use a more durable Read Concern here to make sure this data is not stale.
+      const readConcern = "majority"; //settings.readConcern
+      const aggregateResult = await settings.aggregate(pipeline, {
+        readConcern
+      });
+
+      return await aggregateResult.toArray();
+    } catch (e) {
+      console.error(`Unable to get setting: ${e}`);
+      return { error: e };
+    }
+  }
+
   // get the last setting by key
   static async getLastSetting() {
     try {

@@ -8,6 +8,7 @@ import morgan from "morgan";
 // Routes & models
 import routes from "./routes/_routes.js";
 import invoices from "./models/invoiceModel.js";
+import customers from "./models/customerModel.js";
 import budgets from "./models/budgetModel.js";
 import products from "./models/productsModel.js";
 import COA from "./models/COAModel.js";
@@ -16,7 +17,9 @@ import settings from "./models/AppSettingModel.js";
 import receipts from "./models/receiptsModel.js";
 import cashbook from "./models/cashbookModel.js";
 import users from "./models/usersModel.js";
+import home from "./models/homeModel.js";
 import resume_profile from "./models/resume_profile.js";
+import seeder from "./models/seeder.js";
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -44,6 +47,7 @@ const startServer = async () => {
 
     // Inject DB into models
     await invoices.injectDB(db);
+    await customers.injectDB(db);
     await budgets.injectDB(db);
     await COA.injectDB(db);
     await projects.injectDB(db);
@@ -53,6 +57,8 @@ const startServer = async () => {
     await resume_profile.injectDB(db);
     await cashbook.injectDB(db);
     await users.injectDB(db);
+    await home.injectDB(db);
+    //await seeder.injectDB(db);
 
     app.listen(port, () => console.log(`Server running on port ${port}`));
   } catch (err) {

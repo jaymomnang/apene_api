@@ -23,7 +23,23 @@ export default class appSettingsController {
   static async getAppSettingById(req, res) {
     try {
       let id = req.params.id || {}
-      let appSetting = await appSettings.getAppSettingByID(id)
+      let appSetting = await appSettings.getSettingById(id)
+      if (!appSetting) {
+        res.status(404).json({ error: "Not found" })
+        return
+      }
+      let updated_type = appSetting.lastupdated instanceof Date ? "Date" : "other"
+      res.json({ appSetting, updated_type })
+    } catch (e) {
+      console.log(`api, ${e}`)
+      res.status(500).json({ error: e })
+    }
+  }
+
+  static async getAppSettingbyName(req, res) {
+    try {
+      let name = req.params.name || {}
+      let appSetting = await appSettings.getSettingByName(name)
       if (!appSetting) {
         res.status(404).json({ error: "Not found" })
         return
@@ -116,12 +132,12 @@ export default class appSettingsController {
       let dt = globalOps.currentDateTime();
 
       const result = await appSettings.deleteSetting(key, status, user, dt);
-      if(status !== "suspended"){
+      if (status !== "suspended") {
         res.status(201).json({ message: "Setting activated successfully", setting: result });
-      }else{
+      } else {
         res.status(201).json({ message: "Setting deactivated successfully", setting: result });
       }
-      
+
     } catch (e) {
       console.error(`Error activating/deactivating setting: ${e}`);
       res.status(500).json({ error: "Internal server error" });

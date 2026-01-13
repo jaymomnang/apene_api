@@ -5,12 +5,18 @@ import invoicesCTRL from "../controllers/invoiceController.js"
 import productsCTRL from "../controllers/productsController.js"
 import coaCTRL from "../controllers/COAController.js"
 import budgetCTRL from "../controllers/budgetController.js"
+import customersCTRL from "../controllers/customersController.js"
 import budgetStateCTRL from "../controllers/budgetStateController.js"
+import homeCTRL from "../controllers/homeController.js"
 
 const router = new Router()
 
 //default route
-router.route("/").get(appSettingsCTRL.getAppSettings)
+router.route("/").get(homeCTRL.handShake)
+router.route("/countries").get(homeCTRL.getAllCountries)
+router.route("/states/:country").get(homeCTRL.getStatesbyCountryCode)
+router.route("/country/:country").get(homeCTRL.getCountrybyName)
+router.route("/country/:code").get(homeCTRL.getCountrybyCode)
 
 // routes for app settings
 router.route("/settings/").get(appSettingsCTRL.getAppSettings)
@@ -20,7 +26,18 @@ router.route("/settings/search").get(appSettingsCTRL.searchAppSettings)
 router.route("/settings/facet-search").get(appSettingsCTRL.facetedSearch)
 router.route("/settings/id/:id").get(appSettingsCTRL.getAppSettingById)
 router.route("/settings/id/:id").post(appSettingsCTRL.updateSetting)
+router.route("/settings/name/:name").get(appSettingsCTRL.getAppSettingbyName)
 router.route("/settings/config-options").get(appSettingsCTRL.getConfig)
+
+// routes for customers
+router.route("/customers/").get(customersCTRL.getCustomers)
+router.route("/customers/").post(customersCTRL.addNewCustomer)
+router.route("/customers/delete").post(customersCTRL.deleteCustomer)
+router.route("/customers/search").get(customersCTRL.searchCustomers)
+router.route("/customers/facet-search").get(customersCTRL.facetedSearch)
+router.route("/customers/id/:id").get(customersCTRL.getCustomerById)
+router.route("/customers/id/:id").post(customersCTRL.updateCustomer)
+router.route("/customers/config-options").get(customersCTRL.getConfig)
 
 // routes for app users
 router.route("/people/").get(usersCTRL.getusers)

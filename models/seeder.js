@@ -1,66 +1,63 @@
 /* mySeedScript.js */
 
-// require the necessary libraries
-import faker from "faker";
-import MongoClient from "mongodb";
+let seeder;
 
-//const faker = require("faker");
-//const MongoClient = require("mongodb").MongoClient;
-
-function randomIntFromInterval(min, max) { // min and max included
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-async function seedDB(DB, collection, conn) {
-    // Connection URL
-    const uri = conn;
-
-    const client = new MongoClient(uri, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
-
-    try {
-        await client.connect();
-        console.log("Connected correctly to server");
-
-        const collection = client.db(DB).collection(collection);
-
-        // The drop() command destroys all data from a collection.
-        // Make sure you run it against proper database and collection.
-        collection.drop();
-
-        // make a bunch of time series data
-        let timeSeriesData = [];
-
-        for (let i = 0; i < 5000; i++) {
-            const firstName = faker.name.firstName();
-            const lastName = faker.name.lastName();
-            let newDay = {
-                timestamp_day: faker.date.past(),
-                cat: faker.random.word(),
-                owner: {
-                    email: faker.internet.email(firstName, lastName),
-                    firstName,
-                    lastName,
-                },
-                events: [],
-            };
-
-            for (let j = 0; j < randomIntFromInterval(1, 6); j++) {
-                let newEvent = {
-                    timestamp_event: faker.date.past(),
-                    weight: randomIntFromInterval(14,16),
-                }
-                newDay.events.push(newEvent);
-            }
-            timeSeriesData.push(newDay);
+export default class seederModel {
+    static async injectDB(conn) {
+        if (seeder) {
+            return;
         }
-        collection.insertMany(timeSeriesData);
+        try {
+            //_ns = await conn.db(process.env.NS);
+            // eslint-disable-next-line require-atomic-updates
+            seeder = await conn.db(process.env.NS).collection("countries");
+            //const exec = await this.seedCountriesDB();
 
-        console.log("Database seeded! :)");
-        client.close();
-    } catch (err) {
-        console.log(err.stack);
+        } catch (e) {
+            console.error(
+                `Unable to establish collection handles in seederModel: ${e}`
+            );
+        }
     }
+
+    /// get list of countries and states from an external api
+    static async getCountriesFromExternalAPI() {
+        try {
+            const response = await fetch('https://countriesnow.space/api/v0.1/countries/states');
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Failed to fetch countries:', error);
+            return { error: 'Failed to fetch countries' };
+        }
+    }
+
+    static async seedCountriesDB() {
+        const response = await this.getCountriesFromExternalAPI();
+        if (response.error) {
+            console.log('Error fetching countries:', response.error);
+            return;
+        }
+        try {
+            //const countries = await conn.db(process.env.NS).collection("countries");
+            console.log(seeder);
+            //if(seeder.collection)
+
+            const c = [];
+            response.data.forEach((cAPI) => {
+                let cData = {
+                    country: cAPI.name,
+                    code: cAPI.iso3,
+                    states: cAPI.states
+                }
+                c.push(cData);
+            });
+            seeder.insertMany(c, {w: "majority"});
+            console.log("Countries collection seeded! :)");
+        } catch (e) {
+            console.log(e.stack);
+        }
+
+    }
+
 }
