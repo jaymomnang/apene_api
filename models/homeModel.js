@@ -37,7 +37,7 @@ export default class settingModel {
     Todo: retrieve all countries from the database using slow loading
     */
     try {
-      const pipeline = [{$sort: { country: -1 }}];
+      const pipeline = [{$sort: { country: 1 }}];
       // Use a more durable Read Concern here to make sure this data is not stale.
       const readConcern = "majority"; 
       const aggregateResult = await home.aggregate(pipeline, {readConcern});
@@ -55,7 +55,8 @@ export default class settingModel {
       // Use a more durable Read Concern here to make sure this data is not stale.
       const readConcern = "majority"; 
       const aggregateResult = await home.aggregate(pipeline, {readConcern});
-      return await aggregateResult.states.toArray();
+      let s = await aggregateResult.toArray();
+      return await s[0].states;
     } catch (e) {
       console.error(`Unable to get states: ${e}`);
       return { error: e };
